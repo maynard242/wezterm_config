@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# Editor backups
+*~
+*.swp
+*.swo
+*.bak
+
+# Local overrides (for personal customizations)
+wezterm.local.lua

@@ -181,7 +181,7 @@ config.keys = {
 	{ key = "h", mods = "CTRL", action = act.ActivatePaneDirection("Left") },
 	{ key = "j", mods = "CTRL", action = act.ActivatePaneDirection("Down") },
 	{ key = "k", mods = "CTRL", action = act.ActivatePaneDirection("Up") },
-	{ key = "l", mods = "CTRL", action = "Right") },
+	{ key = "l", mods = "CTRL", action = act.ActivatePaneDirection("Right") },
 
 	-- Alternative pane navigation with Leader
 	{ key = "h", mods = "LEADER", action = act.ActivatePaneDirection("Left") },
