@@ -105,23 +105,32 @@ config.colors = {
 -- Default program (PowerShell as safe fallback)
 config.default_prog = { "powershell.exe" }
 
+-- WSL Domain configuration
+config.wsl_domains = {
+	{
+		name = "WSL:Ubuntu",
+		distribution = "Ubuntu",
+		default_cwd = "~",
+	},
+}
+
+-- Default domain is local (Windows)
+config.default_domain = "local"
+
 -- Launch menu with Ubuntu and Windows options
 config.launch_menu = {
 	{
-		label = "Ubuntu (WSL)",
+		label = "Ubuntu (Default)",
 		args = { "wsl.exe", "-d", "Ubuntu" },
+		domain = { DomainName = "local" },
 	},
 	{
-		label = "WSL (Default)",
-		args = { "wsl.exe" },
+		label = "Ubuntu WSL",
+		domain = { DomainName = "WSL:Ubuntu" },
 	},
 	{
 		label = "PowerShell",
 		args = { "powershell.exe" },
-	},
-	{
-		label = "PowerShell 7",
-		args = { "pwsh.exe" },
 	},
 	{
 		label = "Command Prompt",
@@ -208,7 +217,8 @@ config.keys = {
 	{ key = "l", mods = "LEADER|SHIFT", action = act.ShowLauncher },
 
 	-- Quick spawn specific terminals
-	{ key = "u", mods = "LEADER", action = act.SpawnCommandInNewTab({ args = { "wsl.exe", "-d", "Ubuntu" } }) },
+	{ key = "u", mods = "LEADER", action = act.SpawnCommandInNewTab({ args = { "wsl.exe", "-d", "Ubuntu" }, domain = { DomainName = "local" } }) },
+	{ key = "U", mods = "LEADER|SHIFT", action = act.SpawnCommandInNewTab({ domain = { DomainName = "WSL:Ubuntu" } }) },
 	{ key = "w", mods = "LEADER", action = act.SpawnCommandInNewTab({ args = { "powershell.exe" } }) },
 
 	-- ==========================================================================
