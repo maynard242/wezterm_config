@@ -107,13 +107,13 @@ config.colors = {
 -- =============================================================================
 
 -- Default program to launch Ubuntu WSL
-config.default_prog = { "wsl.exe", "-d", "Ubuntu" }
+config.default_prog = { "wsl.exe", "-d", "Ubuntu-24.04", "--cd", "~" }
 
 -- WSL Domain configuration
 config.wsl_domains = {
 	{
 		name = "WSL:Ubuntu",
-		distribution = "Ubuntu",
+		distribution = "Ubuntu-24.04",
 		default_cwd = "~",
 	},
 }
@@ -122,23 +122,27 @@ config.wsl_domains = {
 config.launch_menu = {
 	{
 		label = "Ubuntu (WSL)",
-		args = { "wsl.exe", "-d", "Ubuntu" },
+		args = { "wsl.exe", "-d", "Ubuntu-24.04", "--cd", "~" },
 	},
 	{
-		label = "Ubuntu (bash.exe)",
-		args = { "bash.exe" },
+		label = "Ubuntu (Windows Home)",
+		args = { "wsl.exe", "-d", "Ubuntu-24.04"},
+		cwd = wezterm.home_dir,
 	},
 	{
 		label = "PowerShell",
-		args = { "powershell.exe" },
+		args = { "powershell.exe", "-NoLogo" },
+		cwd = wezterm.home_dir,
 	},
 	{
 		label = "PowerShell (Admin)",
 		args = { "powershell.exe", "-Command", "Start-Process powershell -Verb runAs" },
+		cwd = wezterm.home_dir,
 	},
 	{
 		label = "Command Prompt",
 		args = { "cmd.exe" },
+		cwd = wezterm.home_dir,
 	},
 }
 
@@ -199,7 +203,7 @@ config.cursor_blink_rate = 500
 
 -- Use OpenGL for better Windows compatibility
 -- Change to "WebGpu" if you have a modern GPU and want better performance
-config.front_end = "OpenGL"
+config.front_end = "WebGpu"
 config.max_fps = 120
 config.animation_fps = 60
 
@@ -449,5 +453,10 @@ config.inactive_pane_hsb = {
 -- Check for updates
 config.check_for_updates = true
 config.check_for_updates_interval_seconds = 86400
+
+wezterm.on("gui-startup", function(cmd)
+	local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
+	window:gui_window():maximize()
+end)
 
 return config
