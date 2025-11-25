@@ -24,6 +24,10 @@ config.font = wezterm.font_with_fallback({
 		weight = "Medium",
 		harfbuzz_features = { "calt=1", "clig=1", "liga=1" },
 	},
+	-- Windows fallback fonts
+	"Cascadia Code",
+	"Consolas",
+	"Courier New",
 	"Symbols Nerd Font Mono",
 	"Noto Color Emoji",
 	"Segoe UI Emoji",
@@ -114,34 +118,27 @@ config.wsl_domains = {
 	},
 }
 
-config.default_domain = "WSL:Ubuntu"
-
--- Launch menu with updated options and proper domains
+-- Launch menu (simplified - no domain field needed)
 config.launch_menu = {
 	{
-		label = "Ubuntu (WSL Default)",
+		label = "Ubuntu (WSL)",
 		args = { "wsl.exe", "-d", "Ubuntu" },
-		domain = { DomainName = "WSL:Ubuntu" },
 	},
 	{
-		label = "Ubuntu (Windows bash)",
-		args = { "bash.exe", "-c", "cd ~; exec bash" },
-		domain = { DomainName = "local" },
+		label = "Ubuntu (bash.exe)",
+		args = { "bash.exe" },
 	},
 	{
 		label = "PowerShell",
 		args = { "powershell.exe" },
-		domain = { DomainName = "local" },
 	},
 	{
 		label = "PowerShell (Admin)",
-		args = { "powershell.exe", "-NoExit", "-Command", "Start-Process powershell -Verb runAs" },
-		domain = { DomainName = "local" },
+		args = { "powershell.exe", "-Command", "Start-Process powershell -Verb runAs" },
 	},
 	{
 		label = "Command Prompt",
 		args = { "cmd.exe" },
-		domain = { DomainName = "local" },
 	},
 }
 
@@ -200,8 +197,9 @@ config.cursor_blink_rate = 500
 -- PERFORMANCE
 -- =============================================================================
 
-config.front_end = "WebGpu"
-config.webgpu_power_preference = "HighPerformance"
+-- Use OpenGL for better Windows compatibility
+-- Change to "WebGpu" if you have a modern GPU and want better performance
+config.front_end = "OpenGL"
 config.max_fps = 120
 config.animation_fps = 60
 
@@ -224,8 +222,7 @@ config.keys = {
 	{ key = "l", mods = "LEADER|SHIFT", action = act.ShowLauncher },
 
 	-- Quick spawn specific terminals
-	{ key = "u", mods = "LEADER", action = act.SpawnCommandInNewTab({ args = { "wsl.exe", "-d", "Ubuntu" }, domain = { DomainName = "local" } }) },
-	{ key = "U", mods = "LEADER|SHIFT", action = act.SpawnCommandInNewTab({ domain = { DomainName = "WSL:Ubuntu" } }) },
+	{ key = "u", mods = "LEADER", action = act.SpawnCommandInNewTab({ args = { "wsl.exe", "-d", "Ubuntu" } }) },
 	{ key = "w", mods = "LEADER", action = act.SpawnCommandInNewTab({ args = { "powershell.exe" } }) },
 
 	-- ==========================================================================
