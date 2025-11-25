@@ -102,8 +102,8 @@ config.colors = {
 -- WINDOWS-SPECIFIC SHELL CONFIGURATION
 -- =============================================================================
 
--- Default program (PowerShell as safe fallback)
-config.default_prog = { "powershell.exe" }
+-- Default program to launch Ubuntu WSL
+config.default_prog = { "wsl.exe", "-d", "Ubuntu" }
 
 -- WSL Domain configuration
 config.wsl_domains = {
@@ -114,27 +114,34 @@ config.wsl_domains = {
 	},
 }
 
--- Default domain is local (Windows)
-config.default_domain = "local"
+config.default_domain = "WSL:Ubuntu"
 
--- Launch menu with Ubuntu and Windows options
+-- Launch menu with updated options and proper domains
 config.launch_menu = {
 	{
-		label = "Ubuntu (Default)",
+		label = "Ubuntu (WSL Default)",
 		args = { "wsl.exe", "-d", "Ubuntu" },
-		domain = { DomainName = "local" },
+		domain = { DomainName = "WSL:Ubuntu" },
 	},
 	{
-		label = "Ubuntu WSL",
-		domain = { DomainName = "WSL:Ubuntu" },
+		label = "Ubuntu (Windows bash)",
+		args = { "bash.exe", "-c", "cd ~; exec bash" },
+		domain = { DomainName = "local" },
 	},
 	{
 		label = "PowerShell",
 		args = { "powershell.exe" },
+		domain = { DomainName = "local" },
+	},
+	{
+		label = "PowerShell (Admin)",
+		args = { "powershell.exe", "-NoExit", "-Command", "Start-Process powershell -Verb runAs" },
+		domain = { DomainName = "local" },
 	},
 	{
 		label = "Command Prompt",
 		args = { "cmd.exe" },
+		domain = { DomainName = "local" },
 	},
 }
 
