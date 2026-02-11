@@ -14,6 +14,44 @@ if wezterm.config_builder then
 end
 
 -- =============================================================================
+-- SMART SPLITS LOGIC (Neovim Integration)
+-- =============================================================================
+
+local function is_vim(pane)
+	-- This checks if the process name is 'vim' or 'nvim'
+	-- or if the user variable IS_NVIM is set (requires smart-splits.nvim)
+	return pane:get_user_vars().IS_NVIM == "true" or pane:get_foreground_process_name():find("n?vim") ~= nil
+end
+
+local direction_keys = {
+	h = "Left",
+	j = "Down",
+	k = "Up",
+	l = "Right",
+}
+
+local function split_nav(resize_or_move, key)
+	return {
+		key = key,
+		mods = resize_or_move == "move" and "CTRL" or "LEADER|SHIFT",
+		action = wezterm.action_callback(function(win, pane)
+			if is_vim(pane) then
+				-- pass the keys through to vim/nvim
+				win:perform_action({
+					SendKey = { key = key, mods = resize_or_move == "move" and "CTRL" or "LEADER|SHIFT" },
+				}, pane)
+			else
+				if resize_or_move == "move" then
+					win:perform_action({ ActivatePaneDirection = direction_keys[key] }, pane)
+				else
+					win:perform_action({ AdjustPaneSize = { direction_keys[key], 5 } }, pane)
+				end
+			end
+		end),
+	}
+end
+
+-- =============================================================================
 -- FONT CONFIGURATION
 -- =============================================================================
 
@@ -134,7 +172,7 @@ config.enable_scroll_bar = false
 -- =============================================================================
 
 config.enable_tab_bar = true
-config.hide_tab_bar_if_only_one_tab = true
+config.hide_tab_bar_if_only_one_tab = false
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
 config.tab_max_width = 32
@@ -168,7 +206,7 @@ config.keys = {
 	{ key = "Enter", mods = "CTRL|SHIFT", action = act.DisableDefaultAssignment },
 
 	-- ==========================================================================
-	-- PANE MANAGEMENT (Neovim-style with Ctrl+h/j/k/l)
+	-- PANE MANAGEMENT (Smart Splits with Ctrl+h/j/k/l)
 	-- ==========================================================================
 
 	-- Split panes
@@ -177,11 +215,11 @@ config.keys = {
 	{ key = "|", mods = "LEADER|SHIFT", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
 	{ key = "_", mods = "LEADER|SHIFT", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
 
-	-- Navigate panes (Vim-style)
-	{ key = "h", mods = "CTRL", action = act.ActivatePaneDirection("Left") },
-	{ key = "j", mods = "CTRL", action = act.ActivatePaneDirection("Down") },
-	{ key = "k", mods = "CTRL", action = act.ActivatePaneDirection("Up") },
-	{ key = "l", mods = "CTRL", action = act.ActivatePaneDirection("Right") },
+	-- Navigate panes (Smart Splits)
+	split_nav("move", "h"),
+	split_nav("move", "j"),
+	split_nav("move", "k"),
+	split_nav("move", "l"),
 
 	-- Alternative pane navigation with Leader
 	{ key = "h", mods = "LEADER", action = act.ActivatePaneDirection("Left") },
@@ -189,11 +227,11 @@ config.keys = {
 	{ key = "k", mods = "LEADER", action = act.ActivatePaneDirection("Up") },
 	{ key = "l", mods = "LEADER", action = act.ActivatePaneDirection("Right") },
 
-	-- Resize panes
-	{ key = "H", mods = "LEADER|SHIFT", action = act.AdjustPaneSize({ "Left", 5 }) },
-	{ key = "J", mods = "LEADER|SHIFT", action = act.AdjustPaneSize({ "Down", 5 }) },
-	{ key = "K", mods = "LEADER|SHIFT", action = act.AdjustPaneSize({ "Up", 5 }) },
-	{ key = "L", mods = "LEADER|SHIFT", action = act.AdjustPaneSize({ "Right", 5 }) },
+	-- Resize panes (Smart Splits)
+	split_nav("resize", "h"),
+	split_nav("resize", "j"),
+	split_nav("resize", "k"),
+	split_nav("resize", "l"),
 
 	-- Close pane
 	{ key = "x", mods = "LEADER", action = act.CloseCurrentPane({ confirm = true }) },
