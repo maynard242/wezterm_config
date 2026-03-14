@@ -1,6 +1,6 @@
 -- WezTerm Configuration
 -- Font: JetBrains Mono
--- Theme: Catppuccin Mocha
+-- Theme: Catppuccin Mocha or Tokyo Night
 -- Neovim-compatible keybindings
 
 local wezterm = require("wezterm")
@@ -69,7 +69,7 @@ config.font = wezterm.font_with_fallback({
 	"Noto Color Emoji",
 })
 
-config.font_size = 14.0
+config.font_size = 15.0
 config.line_height = 1.1
 config.cell_width = 1.0
 
@@ -85,66 +85,67 @@ config.set_environment_variables = {
 -- COLOR SCHEME - Catppuccin Mocha
 -- =============================================================================
 
-config.color_scheme = "Catppuccin Mocha"
+-- config.color_scheme = "Catppuccin Mocha"
+config.color_scheme = "Tokyo Night"
 
 -- Custom Catppuccin Mocha colors (in case the built-in scheme is not available)
-config.colors = {
-	foreground = "#cdd6f4",
-	background = "#1e1e2e",
-	cursor_bg = "#f5e0dc",
-	cursor_fg = "#1e1e2e",
-	cursor_border = "#f5e0dc",
-	selection_fg = "#1e1e2e",
-	selection_bg = "#f5e0dc",
-	scrollbar_thumb = "#585b70",
-	split = "#6c7086",
+-- config.colors = {
+--	foreground = "#cdd6f4",
+--	background = "#1e1e2e",
+--	cursor_bg = "#f5e0dc",
+--	cursor_fg = "#1e1e2e",
+--	cursor_border = "#f5e0dc",
+--	selection_fg = "#1e1e2e",
+--	selection_bg = "#f5e0dc",
+--	scrollbar_thumb = "#585b70",
+--	split = "#6c7086",
 
-	ansi = {
-		"#45475a", -- black
-		"#f38ba8", -- red
-		"#a6e3a1", -- green
-		"#f9e2af", -- yellow
-		"#89b4fa", -- blue
-		"#f5c2e7", -- magenta
-		"#94e2d5", -- cyan
-		"#bac2de", -- white
-	},
-	brights = {
-		"#585b70", -- bright black
-		"#f38ba8", -- bright red
-		"#a6e3a1", -- bright green
-		"#f9e2af", -- bright yellow
-		"#89b4fa", -- bright blue
-		"#f5c2e7", -- bright magenta
-		"#94e2d5", -- bright cyan
-		"#a6adc8", -- bright white
-	},
+--	ansi = {
+--		"#45475a", -- black
+--		"#f38ba8", -- red
+--		"#a6e3a1", -- green
+--		"#f9e2af", -- yellow
+--		"#89b4fa", -- blue
+--		"#f5c2e7", -- magenta
+--		"#94e2d5", -- cyan
+--		"#bac2de", -- white
+--	},
+--	brights = {
+--		"#585b70", -- bright black
+--		"#f38ba8", -- bright red
+--		"#a6e3a1", -- bright green
+--		"#f9e2af", -- bright yellow
+--		"#89b4fa", -- bright blue
+--		"#f5c2e7", -- bright magenta
+--		"#94e2d5", -- bright cyan
+--		"#a6adc8", -- bright white
+--	},
 
-	tab_bar = {
-		background = "#11111b",
-		active_tab = {
-			bg_color = "#cba6f7",
-			fg_color = "#11111b",
-			intensity = "Bold",
-		},
-		inactive_tab = {
-			bg_color = "#181825",
-			fg_color = "#cdd6f4",
-		},
-		inactive_tab_hover = {
-			bg_color = "#313244",
-			fg_color = "#cdd6f4",
-		},
-		new_tab = {
-			bg_color = "#181825",
-			fg_color = "#cdd6f4",
-		},
-		new_tab_hover = {
-			bg_color = "#313244",
-			fg_color = "#cdd6f4",
-		},
-	},
-}
+--	tab_bar = {
+--		background = "#11111b",
+--		active_tab = {
+--			bg_color = "#cba6f7",
+--			fg_color = "#11111b",
+--			intensity = "Bold",
+--		},
+--		inactive_tab = {
+--			bg_color = "#181825",
+--			fg_color = "#cdd6f4",
+--		},
+--		inactive_tab_hover = {
+--			bg_color = "#313244",
+--			fg_color = "#cdd6f4",
+--		},
+--		new_tab = {
+--			bg_color = "#181825",
+--			fg_color = "#cdd6f4",
+--		},
+--		new_tab_hover = {
+--			bg_color = "#313244",
+--			fg_color = "#cdd6f4",
+--		},
+--	},
+--}
 
 -- =============================================================================
 -- WINDOW CONFIGURATION - Modern Setup
@@ -174,7 +175,6 @@ config.window_frame = {
 -- Initial window size and position
 config.initial_cols = 120
 config.initial_rows = 35
-config.initial_window_position = { x = 50, y = 50 }
 
 -- Scrollback
 config.scrollback_lines = 10000
