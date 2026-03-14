@@ -13,9 +13,13 @@ end
 -- =============================================================================
 
 local function is_vim(pane)
+	local process_name = pane:get_foreground_process_name()
+	if process_name == nil then
+		return false
+	end
 	-- This checks if the process name is 'vim' or 'nvim'
 	-- or if the user variable IS_NVIM is set (requires smart-splits.nvim)
-	return pane:get_user_vars().IS_NVIM == "true" or pane:get_foreground_process_name():find("n?vim") ~= nil
+	return pane:get_user_vars().IS_NVIM == "true" or process_name:find("n?vim") ~= nil
 end
 
 local direction_keys = {
@@ -33,7 +37,7 @@ local function split_nav(resize_or_move, key)
 			if is_vim(pane) then
 				-- pass the keys through to vim/nvim
 				win:perform_action({
-					SendKey = { key = key, mods = resize_or_move == "move" and "CTRL" or "LEADER|SHIFT" },
+					SendKey = { key = key, mods = resize_or_move == "move" and "CTRL" or "ALT" },
 				}, pane)
 			else
 				if resize_or_move == "move" then
@@ -65,7 +69,7 @@ config.font = wezterm.font_with_fallback({
 	"Segoe UI Emoji",
 })
 
-config.font_size = 15.4
+config.font_size = 14.0
 config.line_height = 1.1
 config.cell_width = 1.0
 
@@ -146,14 +150,13 @@ config.colors = {
 -- WINDOWS-SPECIFIC SHELL CONFIGURATION
 -- =============================================================================
 
--- Default program to launch Ubuntu WSL
-config.default_prog = { "wsl.exe", "-d", "Ubuntu-24.04", "--cd", "~" }
+-- Default program to launch WSL (standard wsl.exe uses default distro)
+config.default_prog = { "wsl.exe" }
 
 -- WSL Domain configuration
 config.wsl_domains = {
 	{
-		name = "WSL:Ubuntu",
-		distribution = "Ubuntu-24.04",
+		name = "WSL",
 		default_cwd = "~",
 	},
 }
@@ -213,8 +216,7 @@ config.window_frame = {
 -- Initial window size and position
 config.initial_cols = 120
 config.initial_rows = 35
-config.initial_x = 50
-config.initial_y = 50
+config.initial_window_position = { x = 50, y = 50 }
 
 -- Scrollback
 config.scrollback_lines = 10000
@@ -344,7 +346,6 @@ config.keys = {
 
 	-- Paste
 	{ key = "]", mods = "LEADER", action = act.PasteFrom("Clipboard") },
-	{ key = "v", mods = "CTRL", action = act.PasteFrom("Clipboard") },
 
 	-- Scroll
 	{ key = "u", mods = "CTRL", action = act.ScrollByPage(-0.5) },
@@ -360,8 +361,8 @@ config.keys = {
 	{ key = "Space", mods = "LEADER", action = act.QuickSelect },
 
 	-- Search
-	{ key = "/", mods = "LEADER", action = act.Search("CurrentSelectionOrEmptyString") },
-	{ key = "f", mods = "CTRL|SHIFT", action = act.Search("CurrentSelectionOrEmptyString") },
+	{ key = "/", mods = "LEADER", action = act.Search({ CaseInSensitiveString = "" }) },
+	{ key = "f", mods = "CTRL|SHIFT", action = act.Search({ CaseInSensitiveString = "" }) },
 
 	-- Font size
 	{ key = "+", mods = "CTRL|SHIFT", action = act.IncreaseFontSize },
@@ -430,7 +431,7 @@ config.key_tables = {
 		},
 
 		-- Search
-		{ key = "/", mods = "NONE", action = act.Search("CurrentSelectionOrEmptyString") },
+		{ key = "/", mods = "NONE", action = act.Search({ CaseInSensitiveString = "" }) },
 		{ key = "n", mods = "NONE", action = act.CopyMode("NextMatch") },
 		{ key = "N", mods = "SHIFT", action = act.CopyMode("PriorMatch") },
 	},
