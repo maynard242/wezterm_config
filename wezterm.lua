@@ -65,9 +65,17 @@ config.font = wezterm.font_with_fallback({
 	"Noto Color Emoji",
 })
 
-config.font_size = 14.0
+config.font_size = 15.4
 config.line_height = 1.1
 config.cell_width = 1.0
+
+-- =============================================================================
+-- ENVIRONMENT VARIABLES
+-- =============================================================================
+
+config.set_environment_variables = {
+	COLORTERM = "truecolor",
+}
 
 -- =============================================================================
 -- COLOR SCHEME - Catppuccin Mocha
@@ -159,9 +167,11 @@ config.window_frame = {
 	inactive_titlebar_bg = "#11111b",
 }
 
--- Initial window size
+-- Initial window size and position
 config.initial_cols = 120
 config.initial_rows = 35
+config.initial_x = 50
+config.initial_y = 50
 
 -- Scrollback
 config.scrollback_lines = 10000

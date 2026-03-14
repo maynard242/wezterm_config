@@ -65,9 +65,17 @@ config.font = wezterm.font_with_fallback({
 	"Segoe UI Emoji",
 })
 
-config.font_size = 14.0
+config.font_size = 15.4
 config.line_height = 1.1
 config.cell_width = 1.0
+
+-- =============================================================================
+-- ENVIRONMENT VARIABLES
+-- =============================================================================
+
+config.set_environment_variables = {
+	COLORTERM = "truecolor",
+}
 
 -- =============================================================================
 -- COLOR SCHEME - Catppuccin Mocha
@@ -202,9 +210,11 @@ config.window_frame = {
 	inactive_titlebar_bg = "#11111b",
 }
 
--- Initial window size
+-- Initial window size and position
 config.initial_cols = 120
 config.initial_rows = 35
+config.initial_x = 50
+config.initial_y = 50
 
 -- Scrollback
 config.scrollback_lines = 10000
@@ -486,9 +496,9 @@ config.inactive_pane_hsb = {
 config.check_for_updates = true
 config.check_for_updates_interval_seconds = 86400
 
-wezterm.on("gui-startup", function(cmd)
-	local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
-	window:gui_window():maximize()
-end)
+-- wezterm.on("gui-startup", function(cmd)
+-- 	local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
+-- 	window:gui_window():maximize()
+-- end)
 
 return config
