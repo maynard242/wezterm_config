@@ -1,6 +1,6 @@
 -- WezTerm Configuration
 -- Font: JetBrains Mono
--- Theme: Catppuccin Mocha or Tokyo Night
+-- Theme: Catppuccin Mocha
 -- Neovim-compatible keybindings
 
 local wezterm = require("wezterm")
@@ -85,67 +85,66 @@ config.set_environment_variables = {
 -- COLOR SCHEME - Catppuccin Mocha
 -- =============================================================================
 
--- config.color_scheme = "Catppuccin Mocha"
-config.color_scheme = "Tokyo Night"
+config.color_scheme = "Catppuccin Mocha"
 
 -- Custom Catppuccin Mocha colors (in case the built-in scheme is not available)
--- config.colors = {
---	foreground = "#cdd6f4",
---	background = "#1e1e2e",
---	cursor_bg = "#f5e0dc",
---	cursor_fg = "#1e1e2e",
---	cursor_border = "#f5e0dc",
---	selection_fg = "#1e1e2e",
---	selection_bg = "#f5e0dc",
---	scrollbar_thumb = "#585b70",
---	split = "#6c7086",
+config.colors = {
+	foreground = "#cdd6f4",
+	background = "#1e1e2e",
+	cursor_bg = "#f5e0dc",
+	cursor_fg = "#1e1e2e",
+	cursor_border = "#f5e0dc",
+	selection_fg = "#1e1e2e",
+	selection_bg = "#f5e0dc",
+	scrollbar_thumb = "#585b70",
+	split = "#6c7086",
 
---	ansi = {
---		"#45475a", -- black
---		"#f38ba8", -- red
---		"#a6e3a1", -- green
---		"#f9e2af", -- yellow
---		"#89b4fa", -- blue
---		"#f5c2e7", -- magenta
---		"#94e2d5", -- cyan
---		"#bac2de", -- white
---	},
---	brights = {
---		"#585b70", -- bright black
---		"#f38ba8", -- bright red
---		"#a6e3a1", -- bright green
---		"#f9e2af", -- bright yellow
---		"#89b4fa", -- bright blue
---		"#f5c2e7", -- bright magenta
---		"#94e2d5", -- bright cyan
---		"#a6adc8", -- bright white
---	},
+	ansi = {
+		"#45475a", -- black
+		"#f38ba8", -- red
+		"#a6e3a1", -- green
+		"#f9e2af", -- yellow
+		"#89b4fa", -- blue
+		"#f5c2e7", -- magenta
+		"#94e2d5", -- cyan
+		"#bac2de", -- white
+	},
+	brights = {
+		"#585b70", -- bright black
+		"#f38ba8", -- bright red
+		"#a6e3a1", -- bright green
+		"#f9e2af", -- bright yellow
+		"#89b4fa", -- bright blue
+		"#f5c2e7", -- bright magenta
+		"#94e2d5", -- bright cyan
+		"#a6adc8", -- bright white
+	},
 
---	tab_bar = {
---		background = "#11111b",
---		active_tab = {
---			bg_color = "#cba6f7",
---			fg_color = "#11111b",
---			intensity = "Bold",
---		},
---		inactive_tab = {
---			bg_color = "#181825",
---			fg_color = "#cdd6f4",
---		},
---		inactive_tab_hover = {
---			bg_color = "#313244",
---			fg_color = "#cdd6f4",
---		},
---		new_tab = {
---			bg_color = "#181825",
---			fg_color = "#cdd6f4",
---		},
---		new_tab_hover = {
---			bg_color = "#313244",
---			fg_color = "#cdd6f4",
---		},
---	},
---}
+	tab_bar = {
+		background = "#11111b",
+		active_tab = {
+			bg_color = "#cba6f7",
+			fg_color = "#11111b",
+			intensity = "Bold",
+		},
+		inactive_tab = {
+			bg_color = "#181825",
+			fg_color = "#cdd6f4",
+		},
+		inactive_tab_hover = {
+			bg_color = "#313244",
+			fg_color = "#cdd6f4",
+		},
+		new_tab = {
+			bg_color = "#181825",
+			fg_color = "#cdd6f4",
+		},
+		new_tab_hover = {
+			bg_color = "#313244",
+			fg_color = "#cdd6f4",
+		},
+	},
+}
 
 -- =============================================================================
 -- WINDOW CONFIGURATION - Modern Setup
@@ -154,14 +153,14 @@ config.color_scheme = "Tokyo Night"
 -- Window decorations
 config.window_decorations = "RESIZE"
 config.window_background_opacity = 0.95
-config.macos_window_background_blur = 20
+config.macos_window_background_blur = 25
 
--- Window padding
+-- Window padding (tighter for a modern, content-forward feel)
 config.window_padding = {
-	left = 15,
-	right = 15,
-	top = 15,
-	bottom = 15,
+	left = 12,
+	right = 12,
+	top = 12,
+	bottom = 12,
 }
 
 -- Window frame
@@ -178,7 +177,8 @@ config.initial_rows = 35
 
 -- Scrollback
 config.scrollback_lines = 10000
-config.enable_scroll_bar = false
+config.enable_scroll_bar = true
+config.min_scroll_bar_height = "2cell"
 
 -- =============================================================================
 -- TAB BAR CONFIGURATION
@@ -189,6 +189,47 @@ config.hide_tab_bar_if_only_one_tab = false
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
 config.tab_max_width = 32
+config.show_new_tab_button_in_tab_bar = false
+
+-- Powerline-style tab titles with Catppuccin accents
+wezterm.on("format-tab-title", function(tab, _, _, _, hover, max_width)
+	local edge_bg = "#11111b" -- crust (tab bar background)
+	local bg = "#181825" -- mantle (inactive)
+	local fg = "#cdd6f4" -- text
+
+	if tab.is_active then
+		bg = "#cba6f7" -- mauve
+		fg = "#11111b"
+	elseif hover then
+		bg = "#313244" -- surface0
+	end
+
+	local title = (tab.tab_index + 1) .. " · " .. (tab.active_pane.title or "")
+	title = wezterm.truncate_right(title, max_width - 4)
+
+	return {
+		{ Background = { Color = edge_bg } },
+		{ Foreground = { Color = bg } },
+		{ Text = "" },
+		{ Background = { Color = bg } },
+		{ Foreground = { Color = fg } },
+		{ Attribute = { Intensity = tab.is_active and "Bold" or "Normal" } },
+		{ Text = " " .. title .. " " },
+		{ Background = { Color = edge_bg } },
+		{ Foreground = { Color = bg } },
+		{ Text = "" },
+	}
+end)
+
+-- Right status: time / date in Catppuccin sapphire
+wezterm.on("update-right-status", function(window, _)
+	local date = wezterm.strftime("%H:%M  %a %d %b")
+	window:set_right_status(wezterm.format({
+		{ Background = { Color = "#11111b" } },
+		{ Foreground = { Color = "#74c7ec" } }, -- sapphire
+		{ Text = "  " .. date .. "  " },
+	}))
+end)
 
 -- =============================================================================
 -- CURSOR CONFIGURATION
