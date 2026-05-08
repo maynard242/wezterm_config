@@ -200,7 +200,7 @@ config.window_background_opacity = 0.95
 -- Window padding (tighter for a modern, content-forward feel)
 config.window_padding = {
 	left = 12,
-	right = 12,
+	right = 24,
 	top = 12,
 	bottom = 12,
 }

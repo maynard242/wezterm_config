@@ -158,7 +158,7 @@ config.macos_window_background_blur = 25
 -- Window padding (tighter for a modern, content-forward feel)
 config.window_padding = {
 	left = 12,
-	right = 12,
+	right = 24,
 	top = 12,
 	bottom = 12,
 }
