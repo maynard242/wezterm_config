@@ -449,6 +449,30 @@ config.mouse_bindings = {
 		mods = "CTRL",
 		action = act.OpenLinkAtMouseCursor,
 	},
+
+	-- Mouse wheel: scroll 3 lines per tick
+	{
+		event = { Down = { streak = 1, button = { WheelUp = 1 } } },
+		mods = "NONE",
+		action = act.ScrollByLine(-3),
+	},
+	{
+		event = { Down = { streak = 1, button = { WheelDown = 1 } } },
+		mods = "NONE",
+		action = act.ScrollByLine(3),
+	},
+
+	-- Shift+Wheel: half-page jumps (overrides alt-screen apps)
+	{
+		event = { Down = { streak = 1, button = { WheelUp = 1 } } },
+		mods = "SHIFT",
+		action = act.ScrollByPage(-0.5),
+	},
+	{
+		event = { Down = { streak = 1, button = { WheelDown = 1 } } },
+		mods = "SHIFT",
+		action = act.ScrollByPage(0.5),
+	},
 }
 
 -- =============================================================================
