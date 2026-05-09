@@ -38,7 +38,7 @@ Both configurations share a similar logic for "Smart Splits," which allows seaml
 - **Tabs:** `Leader + c` (New), `Leader + n/p` (Next/Prev), `Leader + 1-9` (Direct access).
 - **Panes:** `Leader + \` (Horizontal split), `Leader + -` (Vertical split), `Leader + x` (Close), `Leader + z` (Zoom).
 - **Copy Mode:** `Leader + [` (Vim-style navigation and yanking).
-- **Scrollback:** `Mouse Wheel` (3 lines), `Shift + Mouse Wheel` (half-page, forces WezTerm scrollback in alt-screen apps), `Ctrl + u`/`Ctrl + d` (half-page), `Shift + PageUp`/`PageDown` (full page).
+- **Scrollback:** `Mouse Wheel` (Standard; delegates to apps like tmux/vim), `Shift + Mouse Wheel` (half-page; forces WezTerm scrollback even in alt-screen apps), `Ctrl + u`/`Ctrl + d` (half-page), `Shift + PageUp`/`PageDown` (full page).
 
 ## Development Conventions
 - **Neovim Integration:** Changes to pane navigation must remain compatible with `smart-splits.nvim`. The `is_vim` function in the Lua config detects active Vim/Neovim processes.
