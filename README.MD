@@ -59,6 +59,15 @@ Enter with `Leader + [`:
 - `/`: Search buffer
 - `q / Escape`: Exit copy mode
 
+### Scrollback
+| Action | Keybinding |
+| :--- | :--- |
+| **Scroll 3 lines** | `Mouse Wheel` |
+| **Scroll half-page** (forces scrollback in `vim`/`less`/`tmux`) | `Shift + Mouse Wheel` |
+| **Scroll half-page** | `Ctrl + u` / `Ctrl + d` |
+| **Scroll full page** | `Shift + PageUp` / `Shift + PageDown` |
+| **Clear scrollback** | `Ctrl + Shift + k` |
+
 ## 🔌 Neovim Integration (Required)
 
 To enable the "Smart" navigation between Neovim and WezTerm, you must install [smart-splits.nvim](https://github.com/mrjones2014/smart-splits.nvim) in your Neovim configuration.
