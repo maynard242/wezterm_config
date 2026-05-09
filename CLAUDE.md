@@ -50,6 +50,10 @@ Search bindings use `act.Search({ CaseInSensitiveString = "" })`, not the older 
 
 Both files set `COLORTERM = "truecolor"` via `config.set_environment_variables` so child shells get true-color hints.
 
+### Mouse Wheel Scrollback
+
+Plain `WheelUp`/`WheelDown` is bound to `ScrollByLine(±3)` and `Shift+Wheel` to `ScrollByPage(±0.5)`. The Shift variant is deliberate — `ScrollByPage` always operates on WezTerm's scrollback even inside alt-screen apps (`vim`, `less`, `tmux`), giving a reliable escape hatch when those apps would otherwise capture wheel events. Don't replace this with `alternate_buffer_wheel_scroll_speed` — that translates wheel to arrow keys for the *app*, which is the opposite intent.
+
 ### Windows-Specific Divergence
 
 `wezterm_windows.lua` adds beyond the macOS version:
