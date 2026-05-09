@@ -68,6 +68,22 @@ Enter with `Leader + [`:
 | **Scroll full page** | `Shift + PageUp` / `Shift + PageDown` |
 | **Clear scrollback** | `Ctrl + Shift + k` |
 
+## 🔀 Tmux Integration (Optional)
+
+WezTerm provides a "native-feeling" scrollback experience even when using Tmux. Keybindings like `Ctrl+u` and `Ctrl+d` intelligently pass through to Tmux, and mouse scrolling works natively if Tmux is configured correctly.
+
+### Setup Instructions for `~/.tmux.conf`:
+```tmux
+# Enable mouse support (allows WezTerm to pass mouse events to tmux)
+set -g mouse on
+
+# Optional: if you prefer WezTerm to natively capture all tmux scrollback,
+# bypass the alternate screen (note: this disables tmux's own copy mode scroll):
+# set -ga terminal-overrides ',xterm*:smcup@:rmcup@'
+```
+
+*Note: Hold `Shift` while scrolling the mouse wheel to force WezTerm to scroll its native buffer, bypassing Tmux entirely.*
+
 ## 🔌 Neovim Integration (Required)
 
 To enable the "Smart" navigation between Neovim and WezTerm, you must install [smart-splits.nvim](https://github.com/mrjones2014/smart-splits.nvim) in your Neovim configuration.

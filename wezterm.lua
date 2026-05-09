@@ -27,6 +27,28 @@ local function is_vim(pane)
 	return pane:get_user_vars().IS_NVIM == "true" or process_name:find("n?vim") ~= nil
 end
 
+local function is_interactive(pane)
+	local process_name = pane:get_foreground_process_name()
+	if process_name == nil then
+		return false
+	end
+	return pane:get_user_vars().IS_NVIM == "true" or process_name:find("n?vim") ~= nil or process_name:find("tmux") ~= nil
+end
+
+local function smart_scroll(key, mods, action)
+	return {
+		key = key,
+		mods = mods,
+		action = wezterm.action_callback(function(win, pane)
+			if is_interactive(pane) then
+				win:perform_action({ SendKey = { key = key, mods = mods } }, pane)
+			else
+				win:perform_action(action, pane)
+			end
+		end),
+	}
+end
+
 local direction_keys = {
 	h = "Left",
 	j = "Down",
@@ -334,8 +356,8 @@ config.keys = {
 	{ key = "]", mods = "LEADER", action = act.PasteFrom("Clipboard") },
 
 	-- Scroll
-	{ key = "u", mods = "CTRL", action = act.ScrollByPage(-0.5) },
-	{ key = "d", mods = "CTRL", action = act.ScrollByPage(0.5) },
+	smart_scroll("u", "CTRL", act.ScrollByPage(-0.5)),
+	smart_scroll("d", "CTRL", act.ScrollByPage(0.5)),
 	{ key = "PageUp", mods = "SHIFT", action = act.ScrollByPage(-1) },
 	{ key = "PageDown", mods = "SHIFT", action = act.ScrollByPage(1) },
 
