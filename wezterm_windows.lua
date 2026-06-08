@@ -22,12 +22,22 @@ local function is_vim(pane)
 	return pane:get_user_vars().IS_NVIM == "true" or process_name:find("n?vim") ~= nil
 end
 
+-- A pane is "interactive" if its foreground program has its own meaning for
+-- Ctrl+u / Ctrl+d and we must NOT steal those keys for scrolling. Includes plain
+-- shells (bash/zsh/fish) so Ctrl+u = kill-line and Ctrl+d = EOF keep working in a
+-- WSL shell, plus nvim and tmux. The ScrollByPage fallback only fires for other
+-- fullscreen programs; Shift+PageUp/Down remains the always-available scroll.
 local function is_interactive(pane)
 	local process_name = pane:get_foreground_process_name()
 	if process_name == nil then
 		return false
 	end
-	return pane:get_user_vars().IS_NVIM == "true" or process_name:find("n?vim") ~= nil or process_name:find("tmux") ~= nil
+	return pane:get_user_vars().IS_NVIM == "true"
+		or process_name:find("n?vim") ~= nil
+		or process_name:find("tmux") ~= nil
+		or process_name:find("bash") ~= nil
+		or process_name:find("zsh") ~= nil
+		or process_name:find("fish") ~= nil
 end
 
 local function smart_scroll(key, mods, action)
@@ -101,7 +111,16 @@ config.cell_width = 1.0
 
 config.set_environment_variables = {
 	COLORTERM = "truecolor",
+	TERM_PROGRAM = "wezterm",
 }
+
+-- =============================================================================
+-- TERMINAL IDENTITY
+-- =============================================================================
+-- Use the wezterm terminfo entry for full capability support (undercurl, kitty
+-- graphics protocol, proper SGR mouse reporting). Requires the wezterm terminfo
+-- to be installed on any remote host you SSH into — see README ("Terminfo").
+config.term = "wezterm"
 
 -- =============================================================================
 -- COLOR SCHEME - Catppuccin Mocha
@@ -430,6 +449,7 @@ config.keys = {
 
 	-- Font size
 	{ key = "+", mods = "CTRL|SHIFT", action = act.IncreaseFontSize },
+	{ key = "=", mods = "CTRL", action = act.IncreaseFontSize },
 	{ key = "-", mods = "CTRL", action = act.DecreaseFontSize },
 	{ key = "0", mods = "CTRL", action = act.ResetFontSize },
 
@@ -555,13 +575,11 @@ config.visual_bell = {
 }
 
 -- Hyperlinks
+-- Default rules only. A custom `owner/repo -> github.com` rule was removed: its
+-- regex matched any `foo/bar` token (file paths, dates, package names) and
+-- turned them into bogus links. If you want GitHub shorthand back, anchor it to
+-- an explicit prefix so it can't collide with ordinary paths.
 config.hyperlink_rules = wezterm.default_hyperlink_rules()
-
--- Add custom hyperlink rules
-table.insert(config.hyperlink_rules, {
-	regex = [[["]?([\w\d]{1}[-\w\d]+)(/)([-\w\d\.]+)["]?]],
-	format = "https://github.com/$1/$3",
-})
 
 -- Inactive pane dimming
 config.inactive_pane_hsb = {

@@ -27,12 +27,23 @@ local function is_vim(pane)
 	return pane:get_user_vars().IS_NVIM == "true" or process_name:find("n?vim") ~= nil
 end
 
+-- A pane is "interactive" if its foreground program has its own meaning for
+-- Ctrl+u / Ctrl+d and we must NOT steal those keys for scrolling. This includes
+-- plain shells (bash/zsh/fish) — splits launch a bare shell, where Ctrl+u =
+-- kill-line and Ctrl+d = EOF must keep working — as well as nvim and tmux. The
+-- ScrollByPage fallback only fires for other fullscreen programs; Shift+PageUp/
+-- Down remains the always-available scroll.
 local function is_interactive(pane)
 	local process_name = pane:get_foreground_process_name()
 	if process_name == nil then
 		return false
 	end
-	return pane:get_user_vars().IS_NVIM == "true" or process_name:find("n?vim") ~= nil or process_name:find("tmux") ~= nil
+	return pane:get_user_vars().IS_NVIM == "true"
+		or process_name:find("n?vim") ~= nil
+		or process_name:find("tmux") ~= nil
+		or process_name:find("bash") ~= nil
+		or process_name:find("zsh") ~= nil
+		or process_name:find("fish") ~= nil
 end
 
 local function smart_scroll(key, mods, action)
@@ -101,7 +112,16 @@ config.cell_width = 1.0
 
 config.set_environment_variables = {
 	COLORTERM = "truecolor",
+	TERM_PROGRAM = "wezterm",
 }
+
+-- =============================================================================
+-- TERMINAL IDENTITY
+-- =============================================================================
+
+-- Use the wezterm terminfo entry for full capability support:
+-- undercurl, kitty graphics protocol, proper SGR mouse reporting.
+config.term = "wezterm"
 
 -- =============================================================================
 -- COLOR SCHEME - Catppuccin Mocha
@@ -197,10 +217,15 @@ config.window_frame = {
 config.initial_cols = 120
 config.initial_rows = 35
 
--- Scrollback
-config.scrollback_lines = 10000
+-- Scrollback: kept small because tmux manages its own history buffer.
+-- Set history-limit in ~/.tmux.conf instead (e.g. set -g history-limit 50000).
+config.scrollback_lines = 2000
 config.enable_scroll_bar = true
 config.min_scroll_bar_height = "2cell"
+
+-- With tmux running, sessions persist after the window closes.
+-- No need for WezTerm's close confirmation dialog.
+config.window_close_confirmation = "NeverPrompt"
 
 -- =============================================================================
 -- TAB BAR CONFIGURATION
@@ -272,6 +297,21 @@ config.max_fps = 120
 config.animation_fps = 60
 
 -- =============================================================================
+-- DEFAULT PROGRAM
+-- =============================================================================
+
+-- tmux runs at the TAB level only. Each new window/tab gets its own independent
+-- tmux session (unnamed = auto-numbered); sessions outlive the window — reattach
+-- with `tmux a`. Falls back to $SHELL if tmux is unavailable or fails to start.
+-- Pane splits deliberately launch a bare shell instead (see `split_shell` below)
+-- so we never nest a second tmux inside an already-tmux'd pane.
+config.default_prog = { "bash", "-c", "exec tmux new-session || exec $SHELL" }
+
+-- Bare interactive shell used for pane splits, so splits don't inherit the tmux
+-- default_prog and spawn nested sessions. Inherits the parent pane's environment.
+local split_shell = { args = { os.getenv("SHELL") or "/bin/bash" } }
+
+-- =============================================================================
 -- KEY BINDINGS - Neovim Compatible
 -- =============================================================================
 
@@ -285,11 +325,11 @@ config.keys = {
 	-- PANE MANAGEMENT (Smart Splits with Ctrl+h/j/k/l)
 	-- ==========================================================================
 
-	-- Split panes
-	{ key = "\\", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-	{ key = "-", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
-	{ key = "|", mods = "LEADER|SHIFT", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-	{ key = "_", mods = "LEADER|SHIFT", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+	-- Split panes (bare shell, not tmux — see split_shell above)
+	{ key = "\\", mods = "LEADER", action = act.SplitHorizontal(split_shell) },
+	{ key = "-", mods = "LEADER", action = act.SplitVertical(split_shell) },
+	{ key = "|", mods = "LEADER|SHIFT", action = act.SplitHorizontal(split_shell) },
+	{ key = "_", mods = "LEADER|SHIFT", action = act.SplitVertical(split_shell) },
 
 	-- Navigate panes (Smart Splits)
 	split_nav("move", "h"),
@@ -374,6 +414,7 @@ config.keys = {
 
 	-- Font size
 	{ key = "+", mods = "CTRL|SHIFT", action = act.IncreaseFontSize },
+	{ key = "=", mods = "CTRL", action = act.IncreaseFontSize },
 	{ key = "-", mods = "CTRL", action = act.DecreaseFontSize },
 	{ key = "0", mods = "CTRL", action = act.ResetFontSize },
 
@@ -499,13 +540,11 @@ config.visual_bell = {
 }
 
 -- Hyperlinks
+-- Default rules only. A custom `owner/repo -> github.com` rule was removed: its
+-- regex matched any `foo/bar` token (file paths, dates, package names) and
+-- turned them into bogus links. If you want GitHub shorthand back, anchor it to
+-- an explicit prefix so it can't collide with ordinary paths.
 config.hyperlink_rules = wezterm.default_hyperlink_rules()
-
--- Add custom hyperlink rules
-table.insert(config.hyperlink_rules, {
-	regex = [[["]?([\w\d]{1}[-\w\d]+)(/)([-\w\d\.]+)["]?]],
-	format = "https://github.com/$1/$3",
-})
 
 -- Inactive pane dimming
 config.inactive_pane_hsb = {
@@ -516,8 +555,5 @@ config.inactive_pane_hsb = {
 -- Check for updates
 config.check_for_updates = true
 config.check_for_updates_interval_seconds = 86400
-
--- Default shell
--- config.default_prog = { "/bin/zsh", "-l" }
 
 return config

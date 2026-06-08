@@ -1,7 +1,7 @@
 # GEMINI.md
 
 ## Project Overview
-This repository contains a high-performance, cross-platform WezTerm configuration optimized for Neovim users. It unifies terminal settings across macOS and Windows (WSL) and implements native multiplexing as a `tmux` replacement.
+This repository contains a high-performance, cross-platform WezTerm configuration optimized for Neovim users. It unifies terminal settings across macOS and Windows (WSL). On macOS, tmux runs at the **tab level** (each tab is its own tmux session); **pane splits use a bare shell** so they never nest a second tmux. WezTerm panes/tabs handle in-session layout; tmux handles session persistence.
 
 ### Main Technologies
 - **Terminal Emulator:** WezTerm
@@ -38,9 +38,10 @@ Both configurations share a similar logic for "Smart Splits," which allows seaml
 - **Tabs:** `Leader + c` (New), `Leader + n/p` (Next/Prev), `Leader + 1-9` (Direct access).
 - **Panes:** `Leader + \` (Horizontal split), `Leader + -` (Vertical split), `Leader + x` (Close), `Leader + z` (Zoom).
 - **Copy Mode:** `Leader + [` (Vim-style navigation and yanking).
-- **Scrollback:** `Mouse Wheel` (Standard; delegates to apps like tmux/vim), `Shift + Mouse Wheel` (half-page; forces WezTerm scrollback even in alt-screen apps), `Ctrl + u`/`Ctrl + d` (half-page), `Shift + PageUp`/`PageDown` (full page).
+- **Scrollback:** `Mouse Wheel` (Standard; delegates to apps like tmux/vim), `Shift + Mouse Wheel` (half-page; forces WezTerm scrollback even in alt-screen apps), `Ctrl + u`/`Ctrl + d` (pass through to nvim/tmux/shell, else half-page WezTerm scroll), `Shift + PageUp`/`PageDown` (full page).
 
 ## Development Conventions
 - **Neovim Integration:** Changes to pane navigation must remain compatible with `smart-splits.nvim`. The `is_vim` function in the Lua config detects active Vim/Neovim processes.
 - **Aesthetics:** Maintain the Catppuccin Mocha color scheme and JetBrains Mono font consistency.
 - **Performance:** Keep `WebGpu` as the default front-end for high-refresh-rate support.
+- **Terminfo:** Both configs set `term = "wezterm"`. The `wezterm` terminfo entry must be installed on remote SSH hosts or apps there break — see the README "Terminfo" section.

@@ -36,7 +36,19 @@ To validate config changes, reload via `Leader+r` (`Ctrl+a` then `r`) or open a 
 
 ### Leader Key Convention
 
-Leader is `Ctrl+a` (tmux-compatible) with a 1-second timeout. The config replaces `tmux` for local use; `tmux` is reserved for remote SSH session persistence per the README.
+Leader is `Ctrl+a` (tmux-compatible) with a 1-second timeout.
+
+### tmux at the tab level (macOS)
+
+On macOS, `config.default_prog` launches an unnamed tmux session, so each **window/tab** is its own tmux session that outlives the window (reattach with `tmux a`). **Pane splits deliberately bypass this** — the split keybindings (`\`, `-`, `|`, `_`) pass a bare `split_shell` (`$SHELL`) as their `SpawnCommand`, so a split never nests a second tmux inside an already-tmux'd pane. If you add a new split binding, pass `split_shell`, not `{ domain = "CurrentPaneDomain" }`, or you'll reintroduce nesting. Windows uses `wsl.exe` as `default_prog` (no tmux), so its splits keep the plain `CurrentPaneDomain` form.
+
+### Terminal identity (`config.term`)
+
+Both files set `config.term = "wezterm"` for full local capability (undercurl, kitty graphics, SGR mouse). The cost: the `wezterm` terminfo entry must exist on any remote host you SSH into, or apps there misbehave. The README "Terminfo" section documents the install one-liner. Don't change this to `xterm-256color` without updating both files and the README.
+
+### Ctrl+u / Ctrl+d scroll passthrough (`is_interactive`)
+
+`smart_scroll` only sends `Ctrl+u`/`Ctrl+d` to WezTerm's `ScrollByPage` when `is_interactive(pane)` is false. `is_interactive` matches nvim, tmux, **and plain shells (bash/zsh/fish)** — the shell entries are load-bearing: split panes run a bare shell, and without them WezTerm would steal `Ctrl+u` (kill-line) and `Ctrl+d` (EOF) there. Keep the shell names when editing.
 
 ### Color Scheme
 
@@ -52,7 +64,11 @@ Both files set `COLORTERM = "truecolor"` via `config.set_environment_variables` 
 
 ### Mouse Wheel Scrollback
 
-Plain `WheelUp`/`WheelDown` is bound to `ScrollByLine(±3)` and `Shift+Wheel` to `ScrollByPage(±0.5)`. The Shift variant is deliberate — `ScrollByPage` always operates on WezTerm's scrollback even inside alt-screen apps (`vim`, `less`, `tmux`), giving a reliable escape hatch when those apps would otherwise capture wheel events. Don't replace this with `alternate_buffer_wheel_scroll_speed` — that translates wheel to arrow keys for the *app*, which is the opposite intent.
+Only `Shift+Wheel` is custom-bound, to `ScrollByPage(±0.5)`; plain `WheelUp`/`WheelDown` uses WezTerm's default line scroll (there is no custom `ScrollByLine` binding). The Shift variant is deliberate — `ScrollByPage` always operates on WezTerm's scrollback even inside alt-screen apps (`vim`, `less`, `tmux`), giving a reliable escape hatch when those apps would otherwise capture wheel events. Don't replace this with `alternate_buffer_wheel_scroll_speed` — that translates wheel to arrow keys for the *app*, which is the opposite intent.
+
+### Hyperlinks
+
+Both files use only `wezterm.default_hyperlink_rules()`. A custom `owner/repo → github.com` rule was removed because its regex matched any `foo/bar` token (file paths, dates, package names) and produced bogus links. If reintroducing GitHub shorthand, anchor the regex to an explicit prefix so it can't collide with ordinary paths.
 
 ### Windows-Specific Divergence
 

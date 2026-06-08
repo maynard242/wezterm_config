@@ -68,9 +68,11 @@ Enter with `Leader + [`:
 | **Scroll full page** | `Shift + PageUp` / `Shift + PageDown` |
 | **Clear scrollback** | `Ctrl + Shift + k` |
 
-## 🔀 Tmux Integration (Optional)
+## 🔀 Tmux Integration
 
-WezTerm provides a "native-feeling" scrollback experience even when using Tmux. Keybindings like `Ctrl+u` and `Ctrl+d` intelligently pass through to Tmux, and mouse scrolling works natively if Tmux is configured correctly.
+On macOS, **each tab starts its own tmux session** (`default_prog` runs `tmux new-session`, falling back to `$SHELL` if tmux is missing). Sessions outlive the window — reattach with `tmux a`. **Pane splits launch a bare shell, not tmux**, so splitting a pane never nests a second multiplexer. Windows launches WSL directly and does not start tmux.
+
+WezTerm keeps a "native-feeling" scrollback experience alongside tmux: `Ctrl+u` / `Ctrl+d` pass through to tmux (and to nvim and plain shells, where those keys mean half-page / kill-line / EOF), and mouse scrolling works natively if tmux has `mouse on`.
 
 ### Setup Instructions for `~/.tmux.conf`:
 ```tmux
@@ -82,7 +84,19 @@ set -g mouse on
 # set -ga terminal-overrides ',xterm*:smcup@:rmcup@'
 ```
 
-*Note: Hold `Shift` while scrolling the mouse wheel to force WezTerm to scroll its native buffer, bypassing Tmux entirely.*
+*Note: Hold `Shift` while scrolling the mouse wheel to force WezTerm to scroll its native buffer, bypassing tmux entirely.*
+
+## 🖥️ Terminfo (required for `Ctrl+u`/undercurl over SSH)
+
+Both configs set `term = "wezterm"` for full local capability (undercurl, kitty graphics, SGR mouse). The `wezterm` terminfo entry must exist on every host you SSH into, or remote apps misbehave. Install it on a remote host with:
+
+```bash
+# Copy from your local machine, or fetch the entry, then compile:
+curl -fsSL https://raw.githubusercontent.com/wez/wezterm/main/termwiz/data/wezterm.terminfo \
+  | tic -x -o ~/.terminfo -
+```
+
+If you can't install terminfo on a host, set `TERM=xterm-256color` for that session.
 
 ## 🔌 Neovim Integration (Required)
 
@@ -107,19 +121,19 @@ vim.keymap.set('n', '<C-l>', require('smart-splits').move_cursor_right)
 
 ## 💡 Best Practices
 
-- **Ditch Local tmux**: This config provides all core `tmux` features natively with better performance and GUI integration. Use WezTerm tabs and panes for your local workflow.
-- **Remote Sessions**: Only use `tmux` when SSH-ing into remote servers for session persistence.
-- **Hyperlinks**: Hover over GitHub-style `user/repo` strings and `Ctrl+Click` to open them in your browser.
+- **tmux at the tab level**: New tabs start a tmux session for persistence (reattach with `tmux a`); pane splits stay as bare shells. Use WezTerm panes for in-session layout and tmux for session survival.
+- **Remote Sessions**: Use `tmux` on remote servers for session persistence over SSH.
+- **Hyperlinks**: `Ctrl+Click` any URL to open it. (GitHub `user/repo` shorthand is no longer auto-linked — it produced too many false matches on file paths.)
 
 ## ⚙️ Settings Overview
 
 | Setting | Value |
 | :--- | :--- |
-| **Font** | JetBrains Mono (Medium), 14pt |
+| **Font** | JetBrains Mono (Medium), 15pt |
 | **Theme** | Catppuccin Mocha |
 | **Opacity** | 0.95 |
 | **Front End** | WebGPU |
-| **Scrollback** | 10,000 lines |
+| **Scrollback** | 2,000 lines (macOS) / 10,000 (Windows) |
 | **Tab Bar** | Bottom, always visible |
 
 ---
