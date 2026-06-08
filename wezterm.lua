@@ -1,6 +1,6 @@
 -- WezTerm Configuration
 -- Font: JetBrains Mono
--- Theme: Catppuccin Mocha
+-- Theme: Monokai Pro
 -- Vim/Neovim-compatible keybindings
 
 local wezterm = require("wezterm")
@@ -105,7 +105,7 @@ config.font = wezterm.font_with_fallback({
 	"Noto Color Emoji",
 })
 
-config.font_size = 15.0
+config.font_size = 11.0
 config.line_height = 1.1
 config.cell_width = 1.0
 
@@ -127,66 +127,68 @@ config.set_environment_variables = {
 config.term = "wezterm"
 
 -- =============================================================================
--- COLOR SCHEME - Catppuccin Mocha
+-- COLOR SCHEME - Monokai Pro
 -- =============================================================================
 
-config.color_scheme = "Catppuccin Mocha"
+config.color_scheme = "Monokai Pro (Gogh)"
 
--- Custom Catppuccin Mocha colors (in case the built-in scheme is not available)
+-- Custom Monokai Pro colors. Defined explicitly so the look is identical even
+-- if the named scheme above isn't in this WezTerm build, and so the tab bar /
+-- cursor stay on-palette regardless.
 config.colors = {
-	foreground = "#cdd6f4",
-	background = "#1e1e2e",
-	cursor_bg = "#f5e0dc",
-	cursor_fg = "#1e1e2e",
-	cursor_border = "#f5e0dc",
-	selection_fg = "#1e1e2e",
-	selection_bg = "#f5e0dc",
-	scrollbar_thumb = "#585b70",
-	split = "#6c7086",
+	foreground = "#fcfcfa",
+	background = "#2d2a2e",
+	cursor_bg = "#fcfcfa",
+	cursor_fg = "#2d2a2e",
+	cursor_border = "#fcfcfa",
+	selection_fg = "#fcfcfa",
+	selection_bg = "#5b595c",
+	scrollbar_thumb = "#5b595c",
+	split = "#5b595c",
 
 	ansi = {
-		"#45475a", -- black
-		"#f38ba8", -- red
-		"#a6e3a1", -- green
-		"#f9e2af", -- yellow
-		"#89b4fa", -- blue
-		"#f5c2e7", -- magenta
-		"#94e2d5", -- cyan
-		"#bac2de", -- white
+		"#403e41", -- black
+		"#ff6188", -- red
+		"#a9dc76", -- green
+		"#ffd866", -- yellow
+		"#fc9867", -- blue (Monokai uses orange in this slot)
+		"#ab9df2", -- magenta (purple)
+		"#78dce8", -- cyan
+		"#fcfcfa", -- white
 	},
 	brights = {
-		"#585b70", -- bright black
-		"#f38ba8", -- bright red
-		"#a6e3a1", -- bright green
-		"#f9e2af", -- bright yellow
-		"#89b4fa", -- bright blue
-		"#f5c2e7", -- bright magenta
-		"#94e2d5", -- bright cyan
-		"#a6adc8", -- bright white
+		"#727072", -- bright black (comment grey)
+		"#ff6188", -- bright red
+		"#a9dc76", -- bright green
+		"#ffd866", -- bright yellow
+		"#fc9867", -- bright blue (orange)
+		"#ab9df2", -- bright magenta (purple)
+		"#78dce8", -- bright cyan
+		"#fcfcfa", -- bright white
 	},
 
 	tab_bar = {
-		background = "#11111b",
+		background = "#221f22",
 		active_tab = {
-			bg_color = "#cba6f7",
-			fg_color = "#11111b",
+			bg_color = "#ab9df2",
+			fg_color = "#221f22",
 			intensity = "Bold",
 		},
 		inactive_tab = {
-			bg_color = "#181825",
-			fg_color = "#cdd6f4",
+			bg_color = "#2d2a2e",
+			fg_color = "#fcfcfa",
 		},
 		inactive_tab_hover = {
-			bg_color = "#313244",
-			fg_color = "#cdd6f4",
+			bg_color = "#403e41",
+			fg_color = "#fcfcfa",
 		},
 		new_tab = {
-			bg_color = "#181825",
-			fg_color = "#cdd6f4",
+			bg_color = "#2d2a2e",
+			fg_color = "#fcfcfa",
 		},
 		new_tab_hover = {
-			bg_color = "#313244",
-			fg_color = "#cdd6f4",
+			bg_color = "#403e41",
+			fg_color = "#fcfcfa",
 		},
 	},
 }
@@ -211,9 +213,9 @@ config.window_padding = {
 -- Window frame
 config.window_frame = {
 	font = wezterm.font({ family = "JetBrains Mono", weight = "Bold" }),
-	font_size = 11.0,
-	active_titlebar_bg = "#11111b",
-	inactive_titlebar_bg = "#11111b",
+	font_size = 12.0,
+	active_titlebar_bg = "#221f22",
+	inactive_titlebar_bg = "#221f22",
 }
 
 -- Initial window size and position
@@ -240,17 +242,17 @@ config.use_fancy_tab_bar = false
 config.tab_max_width = 32
 config.show_new_tab_button_in_tab_bar = false
 
--- Powerline-style tab titles with Catppuccin accents
+-- Powerline-style tab titles with Monokai Pro accents
 wezterm.on("format-tab-title", function(tab, _, _, _, hover, max_width)
-	local edge_bg = "#11111b" -- crust (tab bar background)
-	local bg = "#181825" -- mantle (inactive)
-	local fg = "#cdd6f4" -- text
+	local edge_bg = "#221f22" -- darkest (tab bar background)
+	local bg = "#2d2a2e" -- inactive tab
+	local fg = "#fcfcfa" -- text
 
 	if tab.is_active then
-		bg = "#cba6f7" -- mauve
-		fg = "#11111b"
+		bg = "#ab9df2" -- purple accent
+		fg = "#221f22"
 	elseif hover then
-		bg = "#313244" -- surface0
+		bg = "#403e41" -- surface
 	end
 
 	local title = (tab.tab_index + 1) .. " · " .. (tab.active_pane.title or "")
@@ -270,12 +272,12 @@ wezterm.on("format-tab-title", function(tab, _, _, _, hover, max_width)
 	}
 end)
 
--- Right status: time / date in Catppuccin sapphire
+-- Right status: time / date in Monokai Pro cyan
 wezterm.on("update-right-status", function(window, _)
 	local date = wezterm.strftime("%H:%M  %a %d %b")
 	window:set_right_status(wezterm.format({
-		{ Background = { Color = "#11111b" } },
-		{ Foreground = { Color = "#74c7ec" } }, -- sapphire
+		{ Background = { Color = "#221f22" } },
+		{ Foreground = { Color = "#78dce8" } }, -- cyan
 		{ Text = "  " .. date .. "  " },
 	}))
 end)

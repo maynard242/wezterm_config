@@ -6,7 +6,7 @@ This repository contains a high-performance, cross-platform WezTerm configuratio
 ### Main Technologies
 - **Terminal Emulator:** WezTerm
 - **Configuration Language:** Lua
-- **Theme:** Catppuccin Mocha
+- **Theme:** Monokai Pro
 - **Font:** JetBrains Mono (Medium)
 - **Engine:** WebGPU (GPU-accelerated rendering)
 
@@ -42,6 +42,6 @@ Both configurations share a similar logic for "Smart Splits," which allows seaml
 
 ## Development Conventions
 - **Editor Integration:** The `is_vim` function detects active Vim/Neovim processes by foreground process name and forwards `Ctrl+h/j/k/l` into the editor. Keep this process-name detection working for both `vim` and `nvim`; `smart-splits.nvim` remains an optional Neovim add-on for edge-aware navigation.
-- **Aesthetics:** Maintain the Catppuccin Mocha color scheme and JetBrains Mono font consistency.
+- **Aesthetics:** Maintain the Monokai Pro color scheme and JetBrains Mono font consistency.
 - **Performance:** Keep `WebGpu` as the default front-end for high-refresh-rate support.
 - **Terminfo:** Both configs set `term = "wezterm"`. The `wezterm` terminfo entry must be installed on remote SSH hosts or apps there break — see the README "Terminfo" section.

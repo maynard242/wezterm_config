@@ -54,7 +54,7 @@ Both files set `config.term = "wezterm"` for full capability (undercurl, kitty g
 
 ### Color Scheme
 
-Both files set `config.color_scheme = "Catppuccin Mocha"` **and** redefine `config.colors` with explicit Catppuccin hex values. The redundancy is intentional — fallback for WezTerm versions that don't ship the named scheme. Keep both.
+Both files set `config.color_scheme = "Monokai Pro (Gogh)"` **and** redefine `config.colors` with explicit Monokai Pro hex values. The redundancy is intentional — fallback for WezTerm versions that don't ship the named scheme. Keep both.
 
 ### Search Binding Syntax
 

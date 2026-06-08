@@ -7,7 +7,7 @@ A high-performance, cross-platform WezTerm configuration optimized for Vim and N
 - **Smart Splits**: Seamlessly navigate between WezTerm panes and Vim/Neovim splits using `Ctrl+h/j/k/l`.
 - **Multiplexing**: Built-in support for tabs and panes with `tmux`-style leader key (`Ctrl+a`).
 - **Cross-Platform**: Unified configuration for macOS (`wezterm.lua`) and Windows/WSL (`wezterm_windows.lua`).
-- **Aesthetic**: Catppuccin Mocha theme with JetBrains Mono font and 95% background opacity.
+- **Aesthetic**: Monokai Pro theme with JetBrains Mono font and 95% background opacity.
 - **Performance**: GPU-accelerated rendering using WebGPU (120fps).
 
 ## 🛠️ Installation
@@ -160,7 +160,7 @@ vim.keymap.set('n', '<C-l>', require('smart-splits').move_cursor_right)
 | Setting | Value |
 | :--- | :--- |
 | **Font** | JetBrains Mono (Medium), 15pt |
-| **Theme** | Catppuccin Mocha |
+| **Theme** | Monokai Pro |
 | **Opacity** | 0.95 |
 | **Front End** | WebGPU |
 | **Scrollback** | 10,000 lines |
