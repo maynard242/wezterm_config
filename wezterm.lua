@@ -220,15 +220,14 @@ config.window_frame = {
 config.initial_cols = 120
 config.initial_rows = 35
 
--- Scrollback: kept small because tmux manages its own history buffer.
--- Set history-limit in ~/.tmux.conf instead (e.g. set -g history-limit 50000).
-config.scrollback_lines = 2000
+-- Scrollback lives in WezTerm now (no local tmux managing its own history).
+config.scrollback_lines = 10000
 config.enable_scroll_bar = true
 config.min_scroll_bar_height = "2cell"
 
--- With tmux running, sessions persist after the window closes.
--- No need for WezTerm's close confirmation dialog.
-config.window_close_confirmation = "NeverPrompt"
+-- No local tmux persistence anymore, so confirm before closing a window to
+-- avoid losing running shells/panes by accident.
+config.window_close_confirmation = "AlwaysPrompt"
 
 -- =============================================================================
 -- TAB BAR CONFIGURATION
@@ -303,16 +302,11 @@ config.animation_fps = 60
 -- DEFAULT PROGRAM
 -- =============================================================================
 
--- tmux runs at the TAB level only. Each new window/tab gets its own independent
--- tmux session (unnamed = auto-numbered); sessions outlive the window — reattach
--- with `tmux a`. Falls back to $SHELL if tmux is unavailable or fails to start.
--- Pane splits deliberately launch a bare shell instead (see `split_shell` below)
--- so we never nest a second tmux inside an already-tmux'd pane.
-config.default_prog = { "bash", "-c", "exec tmux new-session || exec $SHELL" }
-
--- Bare interactive shell used for pane splits, so splits don't inherit the tmux
--- default_prog and spawn nested sessions. Inherits the parent pane's environment.
-local split_shell = { args = { os.getenv("SHELL") or "/bin/bash" } }
+-- WezTerm owns the local layout (tabs + panes), so tabs and splits launch the
+-- user's login shell directly. tmux is NOT started automatically — run it by
+-- hand on remote hosts (over SSH) when you want session persistence there.
+-- Leaving default_prog unset makes WezTerm spawn the default login shell, which
+-- is what new tabs (`Leader+c`) and splits (`CurrentPaneDomain`) inherit.
 
 -- =============================================================================
 -- KEY BINDINGS - Vim/Neovim Compatible
@@ -328,11 +322,11 @@ config.keys = {
 	-- PANE MANAGEMENT (Smart Splits with Ctrl+h/j/k/l)
 	-- ==========================================================================
 
-	-- Split panes (bare shell, not tmux — see split_shell above)
-	{ key = "\\", mods = "LEADER", action = act.SplitHorizontal(split_shell) },
-	{ key = "-", mods = "LEADER", action = act.SplitVertical(split_shell) },
-	{ key = "|", mods = "LEADER|SHIFT", action = act.SplitHorizontal(split_shell) },
-	{ key = "_", mods = "LEADER|SHIFT", action = act.SplitVertical(split_shell) },
+	-- Split panes (inherit the current pane's program, the login shell)
+	{ key = "\\", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+	{ key = "-", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+	{ key = "|", mods = "LEADER|SHIFT", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+	{ key = "_", mods = "LEADER|SHIFT", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
 
 	-- Navigate panes (Smart Splits)
 	split_nav("move", "h"),

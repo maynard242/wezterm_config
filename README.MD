@@ -68,23 +68,25 @@ Enter with `Leader + [`:
 | **Scroll full page** | `Shift + PageUp` / `Shift + PageDown` |
 | **Clear scrollback** | `Ctrl + Shift + k` |
 
-## 🔀 Tmux Integration
+## 🔀 Multiplexing & Tmux
 
-On macOS, **each tab starts its own tmux session** (`default_prog` runs `tmux new-session`, falling back to `$SHELL` if tmux is missing). Sessions outlive the window — reattach with `tmux a`. **Pane splits launch a bare shell, not tmux**, so splitting a pane never nests a second multiplexer. Windows launches WSL directly and does not start tmux.
+**WezTerm owns the local layout.** Tabs (`Leader+c`) and panes (`Leader+\`, `Leader+-`) are native WezTerm objects and just launch your login shell — WezTerm does **not** start tmux automatically. This keeps tab/window/pane creation fast and avoids the prefix conflict you get when WezTerm's leader (`Ctrl+a`) and tmux's prefix fight over the same key.
 
-WezTerm keeps a "native-feeling" scrollback experience alongside tmux: `Ctrl+u` / `Ctrl+d` pass through to tmux (and to nvim and plain shells, where those keys mean half-page / kill-line / EOF), and mouse scrolling works natively if tmux has `mouse on`.
+Use **tmux only where it earns its keep: on remote hosts over SSH**, for session persistence across disconnects. Start it by hand:
 
-### Setup Instructions for `~/.tmux.conf`:
-```tmux
-# Enable mouse support (allows WezTerm to pass mouse events to tmux)
-set -g mouse on
-
-# Optional: if you prefer WezTerm to natively capture all tmux scrollback,
-# bypass the alternate screen (note: this disables tmux's own copy mode scroll):
-# set -ga terminal-overrides ',xterm*:smcup@:rmcup@'
+```bash
+ssh you@host
+tmux new -A -s main   # attach if it exists, else create
 ```
 
-*Note: Hold `Shift` while scrolling the mouse wheel to force WezTerm to scroll its native buffer, bypassing tmux entirely.*
+When you do run tmux (locally or remote), the scroll keys still behave: `Ctrl+u` / `Ctrl+d` pass through to tmux (and to vim/nvim and plain shells, where those keys mean half-page / kill-line / EOF), and mouse scrolling works if tmux has `mouse on`:
+
+```tmux
+# ~/.tmux.conf — enable mouse so WezTerm can pass wheel events to tmux
+set -g mouse on
+```
+
+*Note: Hold `Shift` while scrolling the mouse wheel to force WezTerm to scroll its own native buffer, bypassing any alt-screen app (vim/less/tmux) entirely.*
 
 ## 🖥️ Terminfo (required for `Ctrl+u`/undercurl over SSH)
 
@@ -137,8 +139,8 @@ vim.keymap.set('n', '<C-l>', require('smart-splits').move_cursor_right)
 
 ## 💡 Best Practices
 
-- **tmux at the tab level**: New tabs start a tmux session for persistence (reattach with `tmux a`); pane splits stay as bare shells. Use WezTerm panes for in-session layout and tmux for session survival.
-- **Remote Sessions**: Use `tmux` on remote servers for session persistence over SSH.
+- **Layout is WezTerm's job**: use WezTerm tabs and panes for local layout — they spawn instantly and there's no multiplexer to fight your leader key.
+- **tmux is for remote persistence**: run `tmux` (e.g. `tmux new -A -s main`) on remote servers over SSH so sessions survive disconnects. No need for it locally.
 - **Hyperlinks**: `Ctrl+Click` any URL to open it. (GitHub `user/repo` shorthand is no longer auto-linked — it produced too many false matches on file paths.)
 
 ## ⚙️ Settings Overview
@@ -149,7 +151,7 @@ vim.keymap.set('n', '<C-l>', require('smart-splits').move_cursor_right)
 | **Theme** | Catppuccin Mocha |
 | **Opacity** | 0.95 |
 | **Front End** | WebGPU |
-| **Scrollback** | 2,000 lines (macOS) / 10,000 (Windows) |
+| **Scrollback** | 10,000 lines |
 | **Tab Bar** | Bottom, always visible |
 
 ---

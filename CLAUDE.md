@@ -36,11 +36,13 @@ To validate config changes, reload via `Leader+r` (`Ctrl+a` then `r`) or open a 
 
 ### Leader Key Convention
 
-Leader is `Ctrl+a` (tmux-compatible) with a 1-second timeout.
+Leader is `Ctrl+a` with a 1-second timeout.
 
-### tmux at the tab level (macOS)
+### WezTerm owns the local layout (no auto-tmux)
 
-On macOS, `config.default_prog` launches an unnamed tmux session, so each **window/tab** is its own tmux session that outlives the window (reattach with `tmux a`). **Pane splits deliberately bypass this** — the split keybindings (`\`, `-`, `|`, `_`) pass a bare `split_shell` (`$SHELL`) as their `SpawnCommand`, so a split never nests a second tmux inside an already-tmux'd pane. If you add a new split binding, pass `split_shell`, not `{ domain = "CurrentPaneDomain" }`, or you'll reintroduce nesting. Windows uses `wsl.exe` as `default_prog` (no tmux), so its splits keep the plain `CurrentPaneDomain` form.
+WezTerm manages tabs and panes natively. On macOS, `config.default_prog` is left **unset**, so new tabs and splits launch the user's login shell; splits use `{ domain = "CurrentPaneDomain" }` (matching Windows, which uses `wsl.exe`). tmux is **not** started automatically — it's a manual tool for remote hosts over SSH (session persistence).
+
+This replaced an earlier "tmux per tab" scheme (`default_prog = tmux new-session`, splits passing a bare `split_shell` to avoid nesting). That hybrid fought the leader key — WezTerm's `Ctrl+a` leader and tmux's prefix collided, so tmux windows couldn't be created — and was removed. **Don't reintroduce an auto-tmux `default_prog`**; if local persistence is ever wanted again, prefer a dedicated keybinding or domain rather than wrapping every shell. Because there's no local tmux, `window_close_confirmation` is `AlwaysPrompt` (closing a window now actually loses its shells) and scrollback is WezTerm's own (`scrollback_lines = 10000`).
 
 ### Terminal identity (`config.term`)
 

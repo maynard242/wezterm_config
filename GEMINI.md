@@ -1,7 +1,7 @@
 # GEMINI.md
 
 ## Project Overview
-This repository contains a high-performance, cross-platform WezTerm configuration optimized for Vim and Neovim users. It unifies terminal settings across macOS and Windows (WSL). On macOS, tmux runs at the **tab level** (each tab is its own tmux session); **pane splits use a bare shell** so they never nest a second tmux. WezTerm panes/tabs handle in-session layout; tmux handles session persistence.
+This repository contains a high-performance, cross-platform WezTerm configuration optimized for Vim and Neovim users. It unifies terminal settings across macOS and Windows (WSL). **WezTerm owns the local layout** — tabs and panes are native WezTerm objects that launch the login shell directly. tmux is **not** started automatically; it is used by hand on remote hosts over SSH for session persistence.
 
 ### Main Technologies
 - **Terminal Emulator:** WezTerm
