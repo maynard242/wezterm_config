@@ -1,3 +1,8 @@
+-- WezTerm Configuration
+-- Font: JetBrains Mono
+-- Theme: Monokai Pro
+-- Vim/Neovim-compatible keybindings
+
 local wezterm = require("wezterm")
 local act = wezterm.action
 
@@ -26,10 +31,11 @@ local function is_vim(pane)
 end
 
 -- A pane is "interactive" if its foreground program has its own meaning for
--- Ctrl+u / Ctrl+d and we must NOT steal those keys for scrolling. Includes plain
--- shells (bash/zsh/fish) so Ctrl+u = kill-line and Ctrl+d = EOF keep working in a
--- WSL shell, plus vim/nvim and tmux. The ScrollByPage fallback only fires for other
--- fullscreen programs; Shift+PageUp/Down remains the always-available scroll.
+-- Ctrl+u / Ctrl+d and we must NOT steal those keys for scrolling. This includes
+-- plain shells (bash/zsh/fish) — splits launch a bare shell, where Ctrl+u =
+-- kill-line and Ctrl+d = EOF must keep working — as well as vim/nvim and tmux. The
+-- ScrollByPage fallback only fires for other fullscreen programs; Shift+PageUp/
+-- Down remains the always-available scroll.
 local function is_interactive(pane)
 	local process_name = pane:get_foreground_process_name()
 	if process_name == nil then
@@ -95,16 +101,11 @@ config.font = wezterm.font_with_fallback({
 		weight = "Medium",
 		harfbuzz_features = { "calt=1", "clig=1", "liga=1" },
 	},
-	-- Windows fallback fonts
-	"Cascadia Code",
-	"Consolas",
-	"Courier New",
 	"Symbols Nerd Font Mono",
 	"Noto Color Emoji",
-	"Segoe UI Emoji",
 })
 
-config.font_size = 14.0
+config.font_size = 10.0
 config.line_height = 1.1
 config.cell_width = 1.0
 
@@ -120,116 +121,76 @@ config.set_environment_variables = {
 -- =============================================================================
 -- TERMINAL IDENTITY
 -- =============================================================================
--- Use the wezterm terminfo entry for full capability support (undercurl, kitty
--- graphics protocol, proper SGR mouse reporting). Requires the wezterm terminfo
--- to be installed on any remote host you SSH into — see README ("Terminfo").
-config.term = "wezterm"
+
+-- Native Windows app (no WSL). Use a universally-recognized terminfo so
+-- PowerShell, cmd, Git Bash, and SSH-to-Linux all behave without having
+-- to install a custom "wezterm" terminfo entry in each environment.
+config.term = "xterm-256color"
 
 -- =============================================================================
--- COLOR SCHEME - Catppuccin Mocha
+-- COLOR SCHEME - Monokai Pro
 -- =============================================================================
 
-config.color_scheme = "Catppuccin Mocha"
+config.color_scheme = "Monokai Pro (Gogh)"
 
--- Custom Catppuccin Mocha colors (in case the built-in scheme is not available)
+-- Custom Monokai Pro colors. Defined explicitly so the look is identical even
+-- if the named scheme above isn't in this WezTerm build, and so the tab bar /
+-- cursor stay on-palette regardless.
 config.colors = {
-	foreground = "#cdd6f4",
-	background = "#1e1e2e",
-	cursor_bg = "#f5e0dc",
-	cursor_fg = "#1e1e2e",
-	cursor_border = "#f5e0dc",
-	selection_fg = "#1e1e2e",
-	selection_bg = "#f5e0dc",
-	scrollbar_thumb = "#585b70",
-	split = "#6c7086",
+	foreground = "#fcfcfa",
+	background = "#2d2a2e",
+	cursor_bg = "#fcfcfa",
+	cursor_fg = "#2d2a2e",
+	cursor_border = "#fcfcfa",
+	selection_fg = "#fcfcfa",
+	selection_bg = "#5b595c",
+	scrollbar_thumb = "#5b595c",
+	split = "#5b595c",
 
 	ansi = {
-		"#45475a", -- black
-		"#f38ba8", -- red
-		"#a6e3a1", -- green
-		"#f9e2af", -- yellow
-		"#89b4fa", -- blue
-		"#f5c2e7", -- magenta
-		"#94e2d5", -- cyan
-		"#bac2de", -- white
+		"#403e41", -- black
+		"#ff6188", -- red
+		"#a9dc76", -- green
+		"#ffd866", -- yellow
+		"#fc9867", -- blue (Monokai uses orange in this slot)
+		"#ab9df2", -- magenta (purple)
+		"#78dce8", -- cyan
+		"#fcfcfa", -- white
 	},
 	brights = {
-		"#585b70", -- bright black
-		"#f38ba8", -- bright red
-		"#a6e3a1", -- bright green
-		"#f9e2af", -- bright yellow
-		"#89b4fa", -- bright blue
-		"#f5c2e7", -- bright magenta
-		"#94e2d5", -- bright cyan
-		"#a6adc8", -- bright white
+		"#727072", -- bright black (comment grey)
+		"#ff6188", -- bright red
+		"#a9dc76", -- bright green
+		"#ffd866", -- bright yellow
+		"#fc9867", -- bright blue (orange)
+		"#ab9df2", -- bright magenta (purple)
+		"#78dce8", -- bright cyan
+		"#fcfcfa", -- bright white
 	},
 
 	tab_bar = {
-		background = "#11111b",
+		background = "#221f22",
 		active_tab = {
-			bg_color = "#cba6f7",
-			fg_color = "#11111b",
+			bg_color = "#ab9df2",
+			fg_color = "#221f22",
 			intensity = "Bold",
 		},
 		inactive_tab = {
-			bg_color = "#181825",
-			fg_color = "#cdd6f4",
+			bg_color = "#2d2a2e",
+			fg_color = "#fcfcfa",
 		},
 		inactive_tab_hover = {
-			bg_color = "#313244",
-			fg_color = "#cdd6f4",
+			bg_color = "#403e41",
+			fg_color = "#fcfcfa",
 		},
 		new_tab = {
-			bg_color = "#181825",
-			fg_color = "#cdd6f4",
+			bg_color = "#2d2a2e",
+			fg_color = "#fcfcfa",
 		},
 		new_tab_hover = {
-			bg_color = "#313244",
-			fg_color = "#cdd6f4",
+			bg_color = "#403e41",
+			fg_color = "#fcfcfa",
 		},
-	},
-}
-
--- =============================================================================
--- WINDOWS-SPECIFIC SHELL CONFIGURATION
--- =============================================================================
-
--- Default program to launch WSL (standard wsl.exe uses default distro)
-config.default_prog = { "wsl.exe" }
-
--- WSL Domain configuration
-config.wsl_domains = {
-	{
-		name = "WSL",
-		default_cwd = "~",
-	},
-}
-
--- Launch menu (simplified - no domain field needed)
-config.launch_menu = {
-	{
-		label = "Ubuntu (WSL)",
-		args = { "wsl.exe", "-d", "Ubuntu-24.04", "--cd", "~" },
-	},
-	{
-		label = "Ubuntu (Windows Home)",
-		args = { "wsl.exe", "-d", "Ubuntu-24.04"},
-		cwd = wezterm.home_dir,
-	},
-	{
-		label = "PowerShell",
-		args = { "powershell.exe", "-NoLogo" },
-		cwd = wezterm.home_dir,
-	},
-	{
-		label = "PowerShell (Admin)",
-		args = { "powershell.exe", "-Command", "Start-Process powershell -Verb runAs" },
-		cwd = wezterm.home_dir,
-	},
-	{
-		label = "Command Prompt",
-		args = { "cmd.exe" },
-		cwd = wezterm.home_dir,
 	},
 }
 
@@ -237,9 +198,10 @@ config.launch_menu = {
 -- WINDOW CONFIGURATION - Modern Setup
 -- =============================================================================
 
--- Window decorations (RESIZE works well on Windows)
+-- Window decorations
 config.window_decorations = "RESIZE"
 config.window_background_opacity = 0.95
+config.macos_window_background_blur = 25
 
 -- Window padding (tighter for a modern, content-forward feel)
 config.window_padding = {
@@ -252,43 +214,46 @@ config.window_padding = {
 -- Window frame
 config.window_frame = {
 	font = wezterm.font({ family = "JetBrains Mono", weight = "Bold" }),
-	font_size = 10.0,
-	active_titlebar_bg = "#11111b",
-	inactive_titlebar_bg = "#11111b",
+	font_size = 11.0,
+	active_titlebar_bg = "#221f22",
+	inactive_titlebar_bg = "#221f22",
 }
 
 -- Initial window size and position
 config.initial_cols = 120
 config.initial_rows = 35
-config.initial_window_position = { x = 50, y = 50 }
 
--- Scrollback
+-- Scrollback lives in WezTerm now (no local tmux managing its own history).
 config.scrollback_lines = 10000
 config.enable_scroll_bar = true
 config.min_scroll_bar_height = "2cell"
+
+-- No local tmux persistence anymore, so confirm before closing a window to
+-- avoid losing running shells/panes by accident.
+config.window_close_confirmation = "AlwaysPrompt"
 
 -- =============================================================================
 -- TAB BAR CONFIGURATION
 -- =============================================================================
 
 config.enable_tab_bar = true
-config.hide_tab_bar_if_only_one_tab = false  -- Always show to access launch menu
+config.hide_tab_bar_if_only_one_tab = false
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
 config.tab_max_width = 32
 config.show_new_tab_button_in_tab_bar = false
 
--- Powerline-style tab titles with Catppuccin accents
+-- Powerline-style tab titles with Monokai Pro accents
 wezterm.on("format-tab-title", function(tab, _, _, _, hover, max_width)
-	local edge_bg = "#11111b" -- crust (tab bar background)
-	local bg = "#181825" -- mantle (inactive)
-	local fg = "#cdd6f4" -- text
+	local edge_bg = "#221f22" -- darkest (tab bar background)
+	local bg = "#2d2a2e" -- inactive tab
+	local fg = "#fcfcfa" -- text
 
 	if tab.is_active then
-		bg = "#cba6f7" -- mauve
-		fg = "#11111b"
+		bg = "#ab9df2" -- purple accent
+		fg = "#221f22"
 	elseif hover then
-		bg = "#313244" -- surface0
+		bg = "#403e41" -- surface
 	end
 
 	local title = (tab.tab_index + 1) .. " · " .. (tab.active_pane.title or "")
@@ -308,12 +273,12 @@ wezterm.on("format-tab-title", function(tab, _, _, _, hover, max_width)
 	}
 end)
 
--- Right status: time / date in Catppuccin sapphire
+-- Right status: time / date in Monokai Pro cyan
 wezterm.on("update-right-status", function(window, _)
 	local date = wezterm.strftime("%H:%M  %a %d %b")
 	window:set_right_status(wezterm.format({
-		{ Background = { Color = "#11111b" } },
-		{ Foreground = { Color = "#74c7ec" } }, -- sapphire
+		{ Background = { Color = "#221f22" } },
+		{ Foreground = { Color = "#78dce8" } }, -- cyan
 		{ Text = "  " .. date .. "  " },
 	}))
 end)
@@ -331,11 +296,20 @@ config.cursor_blink_rate = 500
 -- PERFORMANCE
 -- =============================================================================
 
--- Use OpenGL for better Windows compatibility
--- Change to "WebGpu" if you have a modern GPU and want better performance
 config.front_end = "WebGpu"
+config.webgpu_power_preference = "HighPerformance"
 config.max_fps = 120
 config.animation_fps = 60
+
+-- =============================================================================
+-- DEFAULT PROGRAM
+-- =============================================================================
+
+-- WezTerm owns the local layout (tabs + panes), so tabs and splits launch the
+-- user's login shell directly. tmux is NOT started automatically — run it by
+-- hand on remote hosts (over SSH) when you want session persistence there.
+-- Leaving default_prog unset makes WezTerm spawn the default login shell, which
+-- is what new tabs (`Leader+c`) and splits (`CurrentPaneDomain`) inherit.
 
 -- =============================================================================
 -- KEY BINDINGS - Vim/Neovim Compatible
@@ -348,22 +322,10 @@ config.keys = {
 	{ key = "Enter", mods = "CTRL|SHIFT", action = act.DisableDefaultAssignment },
 
 	-- ==========================================================================
-	-- LAUNCH MENU & DOMAIN SWITCHING
-	-- ==========================================================================
-
-	-- Open launch menu to select terminal type
-	{ key = "l", mods = "ALT", action = act.ShowLauncher },
-	{ key = "l", mods = "LEADER|SHIFT", action = act.ShowLauncher },
-
-	-- Quick spawn specific terminals
-	{ key = "u", mods = "LEADER", action = act.SpawnCommandInNewTab({ args = { "wsl.exe", "-d", "Ubuntu" } }) },
-	{ key = "w", mods = "LEADER", action = act.SpawnCommandInNewTab({ args = { "powershell.exe" } }) },
-
-	-- ==========================================================================
 	-- PANE MANAGEMENT (Smart Splits with Ctrl+h/j/k/l)
 	-- ==========================================================================
 
-	-- Split panes
+	-- Split panes (inherit the current pane's program, the login shell)
 	{ key = "\\", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
 	{ key = "-", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
 	{ key = "|", mods = "LEADER|SHIFT", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
@@ -593,10 +555,5 @@ config.inactive_pane_hsb = {
 -- Check for updates
 config.check_for_updates = true
 config.check_for_updates_interval_seconds = 86400
-
--- wezterm.on("gui-startup", function(cmd)
--- 	local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
--- 	window:gui_window():maximize()
--- end)
 
 return config
