@@ -12,13 +12,20 @@ A high-performance, cross-platform WezTerm configuration optimized for Vim and N
 
 ## 🛠️ Installation
 
-### macOS
+### macOS / Linux
 ```bash
-ln -sf $(pwd)/wezterm.lua ~/.wezterm.lua
+./install.sh
+```
+Symlinks `wezterm.lua` → `~/.wezterm.lua` (edits in this repo stay live) and backs up any existing config. Equivalent manual step:
+```bash
+ln -sf "$(pwd)/wezterm.lua" ~/.wezterm.lua
 ```
 
 ### Windows
-Copy `wezterm_windows.lua` to your WezTerm configuration directory (usually `%USERPROFILE%\.config\wezterm\wezterm.lua` or `%USERPROFILE%\.wezterm.lua`).
+```powershell
+./install.ps1
+```
+Copies `wezterm_windows.lua` → `%USERPROFILE%\.wezterm.lua` and backs up any existing config. Re-run after pulling updates. Equivalent manual step: copy `wezterm_windows.lua` to `%USERPROFILE%\.wezterm.lua` (or `%USERPROFILE%\.config\wezterm\wezterm.lua`).
 
 ## ⌨️ Keybindings
 
