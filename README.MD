@@ -16,7 +16,7 @@ A high-performance, cross-platform WezTerm configuration optimized for Vim and N
 ```bash
 ./install.sh
 ```
-Symlinks `wezterm.lua` → `~/.wezterm.lua` (edits in this repo stay live) and backs up any existing config. Equivalent manual step:
+Symlinks `wezterm.lua` → `~/.wezterm.lua` (edits in this repo stay live), backs up any existing config, and installs the bundled `wezterm` terminfo entry (needed so Backspace etc. work under `term = "wezterm"`). Equivalent manual step:
 ```bash
 ln -sf "$(pwd)/wezterm.lua" ~/.wezterm.lua
 ```
@@ -95,17 +95,22 @@ set -g mouse on
 
 *Note: Hold `Shift` while scrolling the mouse wheel to force WezTerm to scroll its own native buffer, bypassing any alt-screen app (vim/less/tmux) entirely.*
 
-## 🖥️ Terminfo (required for `Ctrl+u`/undercurl over SSH)
+## 🖥️ Terminfo (required `term = "wezterm"` entry)
 
-Both configs set `term = "wezterm"` for full local capability (undercurl, kitty graphics, SGR mouse). The `wezterm` terminfo entry must exist on every host you SSH into, or remote apps misbehave. Install it on a remote host with:
+Both configs set `term = "wezterm"` for full capability (undercurl, kitty graphics, SGR mouse). The `wezterm` terminfo entry must exist **wherever your shell runs** — including the **local** machine. If it's missing, an interactive shell misbehaves (e.g. Backspace stops erasing) in new tabs/windows. The entry is bundled in this repo as `wezterm.terminfo`, and `install.sh` installs it automatically.
+
+Install it manually (locally or on a remote SSH host) with either:
 
 ```bash
-# Copy from your local machine, or fetch the entry, then compile:
+# from this repo (offline):
+tic -x -o ~/.terminfo wezterm.terminfo
+
+# or fetch the latest entry:
 curl -fsSL https://raw.githubusercontent.com/wez/wezterm/main/termwiz/data/wezterm.terminfo \
   | tic -x -o ~/.terminfo -
 ```
 
-If you can't install terminfo on a host, set `TERM=xterm-256color` for that session.
+Verify with `infocmp wezterm`. If you can't install it somewhere, set `TERM=xterm-256color` for that session.
 
 ## 🔌 Editor Integration (Vim & Neovim)
 

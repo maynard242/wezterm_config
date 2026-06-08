@@ -46,7 +46,7 @@ This replaced an earlier "tmux per tab" scheme (`default_prog = tmux new-session
 
 ### Terminal identity (`config.term`)
 
-Both files set `config.term = "wezterm"` for full local capability (undercurl, kitty graphics, SGR mouse). The cost: the `wezterm` terminfo entry must exist on any remote host you SSH into, or apps there misbehave. The README "Terminfo" section documents the install one-liner. Don't change this to `xterm-256color` without updating both files and the README.
+Both files set `config.term = "wezterm"` for full capability (undercurl, kitty graphics, SGR mouse). The cost: the `wezterm` terminfo entry must exist **wherever the shell runs** — the local machine as well as any remote host you SSH into — or interactive shells misbehave (e.g. Backspace stops erasing). This bit locally once tmux stopped wrapping every tab (tmux ran under `tmux-256color`, masking the missing entry). The entry is bundled as `wezterm.terminfo` and `install.sh` installs it (`tic -x -o ~/.terminfo wezterm.terminfo`); the README "Terminfo" section documents manual install. Don't change `term` to `xterm-256color` without updating both files and the README.
 
 ### Ctrl+u / Ctrl+d scroll passthrough (`is_interactive`)
 

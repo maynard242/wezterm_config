@@ -26,3 +26,10 @@ if (Test-Path $dest) {
 Copy-Item -Path $src -Destination $dest
 Write-Host "Copied $src -> $dest"
 Write-Host "Reload WezTerm (Leader+r) or open a new window to apply."
+Write-Host ""
+Write-Host "Note: the config sets term = 'wezterm'. Your shells run inside WSL,"
+Write-Host "so install the matching terminfo *inside WSL* (otherwise Backspace etc."
+Write-Host "may misbehave). From a WSL shell, run this repo's installer:"
+Write-Host "    ./install.sh"
+Write-Host "or just the terminfo step:"
+Write-Host "    tic -x -o ~/.terminfo wezterm.terminfo"

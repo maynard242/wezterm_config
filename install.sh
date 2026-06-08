@@ -30,4 +30,19 @@ fi
 
 ln -s "$src" "$dest"
 echo "Linked $dest -> $src"
-echo "Reload WezTerm (Leader+r) or open a new window to apply."
+
+# Install the wezterm terminfo entry if it's missing. The config sets
+# term = "wezterm"; without this entry an interactive shell misbehaves
+# (e.g. Backspace stops erasing) in new tabs/windows.
+if command -v infocmp >/dev/null 2>&1 && infocmp wezterm >/dev/null 2>&1; then
+	echo "wezterm terminfo already installed."
+elif command -v tic >/dev/null 2>&1; then
+	tic -x -o "$HOME/.terminfo" "$repo_dir/wezterm.terminfo" && \
+		echo "Installed wezterm terminfo to ~/.terminfo"
+else
+	echo "warning: 'tic' not found — could not install the wezterm terminfo." >&2
+	echo "         Install ncurses (provides tic) and re-run, or the shell may" >&2
+	echo "         mishandle Backspace under TERM=wezterm." >&2
+fi
+
+echo "Reload WezTerm (Leader+r) or open a new window/tab to apply."
