@@ -28,11 +28,11 @@ To validate config changes, reload via `Leader+r` (`Ctrl+a` then `r`) or open a 
 
 ### Smart Splits (the non-obvious bit)
 
-`split_nav()` and `is_vim()` at the top of each file implement transparent navigation between WezTerm panes and Neovim splits.
+`split_nav()` and `is_vim()` at the top of each file implement transparent navigation between WezTerm panes and Vim/Neovim splits.
 
-- `is_vim(pane)` checks two signals: `pane:get_user_vars().IS_NVIM == "true"` (set by `smart-splits.nvim` via `set_gui_var = true`) **and** the foreground process name matching `n?vim`. Either triggers passthrough. The function nil-guards `get_foreground_process_name()` — keep that guard, it prevents crashes when the process name is briefly nil.
-- **Modifier asymmetry** (deliberate): the WezTerm-side binding for resize uses `LEADER|SHIFT`, but when passed through to Neovim the SendKey uses `ALT`. The Neovim side (smart-splits.nvim) is configured to expect Alt-based resize. Don't "fix" this to match.
-- Move uses plain `CTRL` on both sides.
+- `is_vim(pane)` detects the editor purely by foreground process name matching `n?vim` (matches both `vim` and `nvim`). It nil-guards `get_foreground_process_name()` — keep that guard, it prevents crashes when the process name is briefly nil. (There used to be a `pane:get_user_vars().IS_NVIM == "true"` signal set by `smart-splits.nvim`; it was dropped since the config targets plain Vim too, where nothing sets that var. `smart-splits.nvim` still works because its process is named `nvim`.)
+- **Move** keys (`Ctrl+h/j/k/l`) are forwarded into the editor unchanged when `is_vim` is true; otherwise they switch WezTerm panes. Map them to `<C-w>h/j/k/l` in your `.vimrc`.
+- **Resize** (`Leader+Shift+h/j/k/l`) always acts on the WezTerm pane — it is never forwarded to the editor. (An older version forwarded resize to Neovim as `ALT`-modified keys for `smart-splits.nvim`; that passthrough was removed because plain Vim has no matching binding.)
 
 ### Leader Key Convention
 

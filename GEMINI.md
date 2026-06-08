@@ -1,7 +1,7 @@
 # GEMINI.md
 
 ## Project Overview
-This repository contains a high-performance, cross-platform WezTerm configuration optimized for Neovim users. It unifies terminal settings across macOS and Windows (WSL). On macOS, tmux runs at the **tab level** (each tab is its own tmux session); **pane splits use a bare shell** so they never nest a second tmux. WezTerm panes/tabs handle in-session layout; tmux handles session persistence.
+This repository contains a high-performance, cross-platform WezTerm configuration optimized for Vim and Neovim users. It unifies terminal settings across macOS and Windows (WSL). On macOS, tmux runs at the **tab level** (each tab is its own tmux session); **pane splits use a bare shell** so they never nest a second tmux. WezTerm panes/tabs handle in-session layout; tmux handles session persistence.
 
 ### Main Technologies
 - **Terminal Emulator:** WezTerm
@@ -17,7 +17,7 @@ The configuration is split into two primary entry points based on the operating 
 
 **Maintenance Note:** Both configurations must be kept in sync. Any changes or improvements should be implemented in `wezterm.lua` first, as it serves as the source of truth for the project's logic and aesthetics.
 
-Both configurations share a similar logic for "Smart Splits," which allows seamless navigation between WezTerm panes and Neovim splits when using the `smart-splits.nvim` plugin.
+Both configurations share a similar logic for "Smart Splits," which allows seamless navigation between WezTerm panes and Vim/Neovim splits. Detection is by foreground process name (`vim`/`nvim`), so no editor plugin is required; `smart-splits.nvim` is an optional Neovim add-on for edge-aware navigation.
 
 ## Key Files
 - **`wezterm.lua`**: The main configuration file for macOS. Handles font rendering, window styling, and advanced keybindings.
@@ -41,7 +41,7 @@ Both configurations share a similar logic for "Smart Splits," which allows seaml
 - **Scrollback:** `Mouse Wheel` (Standard; delegates to apps like tmux/vim), `Shift + Mouse Wheel` (half-page; forces WezTerm scrollback even in alt-screen apps), `Ctrl + u`/`Ctrl + d` (pass through to nvim/tmux/shell, else half-page WezTerm scroll), `Shift + PageUp`/`PageDown` (full page).
 
 ## Development Conventions
-- **Neovim Integration:** Changes to pane navigation must remain compatible with `smart-splits.nvim`. The `is_vim` function in the Lua config detects active Vim/Neovim processes.
+- **Editor Integration:** The `is_vim` function detects active Vim/Neovim processes by foreground process name and forwards `Ctrl+h/j/k/l` into the editor. Keep this process-name detection working for both `vim` and `nvim`; `smart-splits.nvim` remains an optional Neovim add-on for edge-aware navigation.
 - **Aesthetics:** Maintain the Catppuccin Mocha color scheme and JetBrains Mono font consistency.
 - **Performance:** Keep `WebGpu` as the default front-end for high-refresh-rate support.
 - **Terminfo:** Both configs set `term = "wezterm"`. The `wezterm` terminfo entry must be installed on remote SSH hosts or apps there break — see the README "Terminfo" section.

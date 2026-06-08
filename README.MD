@@ -1,10 +1,10 @@
 # WezTerm Configuration
 
-A high-performance, cross-platform WezTerm configuration optimized for Neovim users. This setup unifies settings across macOS and Windows (WSL) and implements native multiplexing to replace `tmux`.
+A high-performance, cross-platform WezTerm configuration optimized for Vim and Neovim users. This setup unifies settings across macOS and Windows (WSL) and implements native multiplexing to replace `tmux`.
 
 ## 🚀 Key Features
 
-- **Smart Splits**: Seamlessly navigate between WezTerm panes and Neovim splits using `Ctrl+h/j/k/l`.
+- **Smart Splits**: Seamlessly navigate between WezTerm panes and Vim/Neovim splits using `Ctrl+h/j/k/l`.
 - **Multiplexing**: Built-in support for tabs and panes with `tmux`-style leader key (`Ctrl+a`).
 - **Cross-Platform**: Unified configuration for macOS (`wezterm.lua`) and Windows/WSL (`wezterm_windows.lua`).
 - **Aesthetic**: Catppuccin Mocha theme with JetBrains Mono font and 95% background opacity.
@@ -25,7 +25,7 @@ Copy `wezterm_windows.lua` to your WezTerm configuration directory (usually `%US
 **Leader Key**: `Ctrl + a`
 
 ### Pane & Split Management (Smart)
-The following keys automatically detect if you are inside Neovim and switch splits/panes accordingly.
+The following keys automatically detect if you are inside Vim/Neovim and switch splits/panes accordingly.
 
 | Action | Keybinding |
 | :--- | :--- |
@@ -98,21 +98,37 @@ curl -fsSL https://raw.githubusercontent.com/wez/wezterm/main/termwiz/data/wezte
 
 If you can't install terminfo on a host, set `TERM=xterm-256color` for that session.
 
-## 🔌 Neovim Integration (Required)
+## 🔌 Editor Integration (Vim & Neovim)
 
-To enable the "Smart" navigation between Neovim and WezTerm, you must install [smart-splits.nvim](https://github.com/mrjones2014/smart-splits.nvim) in your Neovim configuration.
+WezTerm detects an active editor purely by **process name** (`vim` or `nvim` in the
+foreground), so smart navigation works for both — no GUI user-var plugin is required.
+When the editor is focused, `Ctrl+h/j/k/l` are forwarded *into* the editor instead of
+switching WezTerm panes; otherwise they switch panes.
 
-### Setup Instructions:
-1. Install `mrjones2014/smart-splits.nvim`.
-2. Configure it in your `init.lua`:
+### Vim
+
+Add the window-navigation maps so the forwarded keys actually switch Vim windows
+(by default Vim's `Ctrl+h` just moves the cursor left):
+
+```vim
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+```
+
+> **Edge caveat:** plain Vim does not hand the key back to WezTerm when you're already
+> at the outermost window, so `Ctrl+h/j/k/l` navigates *within* Vim only. To jump from
+> Vim out into a sibling WezTerm pane, use **`Leader + h/j/k/l`**.
+
+### Neovim (optional, for edge-aware navigation)
+
+If you want `Ctrl+h/j/k/l` to cross seamlessly between Neovim splits **and** WezTerm
+panes (including at the edges), install [smart-splits.nvim](https://github.com/mrjones2014/smart-splits.nvim):
 
 ```lua
-require('smart-splits').setup({
-  -- Essential: This tells WezTerm that Neovim is active
-  set_gui_var = true, 
-})
+require('smart-splits').setup({})
 
--- Recommended Keymaps
 vim.keymap.set('n', '<C-h>', require('smart-splits').move_cursor_left)
 vim.keymap.set('n', '<C-j>', require('smart-splits').move_cursor_down)
 vim.keymap.set('n', '<C-k>', require('smart-splits').move_cursor_up)

@@ -1,7 +1,7 @@
 -- WezTerm Configuration
 -- Font: JetBrains Mono
 -- Theme: Catppuccin Mocha
--- Neovim-compatible keybindings
+-- Vim/Neovim-compatible keybindings
 
 local wezterm = require("wezterm")
 local act = wezterm.action
@@ -14,23 +14,26 @@ if wezterm.config_builder then
 end
 
 -- =============================================================================
--- SMART SPLITS LOGIC (Neovim Integration)
+-- SMART SPLITS LOGIC (Vim/Neovim Integration)
 -- =============================================================================
 
+-- True when the pane's foreground process is vim or nvim, so we forward
+-- window-navigation keys into the editor instead of switching WezTerm panes.
+-- Detection is purely by process name — "n?vim" matches both `vim` and `nvim`.
+-- Keep the nil-guard above: get_foreground_process_name() is briefly nil during
+-- process spawn and indexing nil would crash the callback.
 local function is_vim(pane)
 	local process_name = pane:get_foreground_process_name()
 	if process_name == nil then
 		return false
 	end
-	-- This checks if the process name is 'vim' or 'nvim'
-	-- or if the user variable IS_NVIM is set (requires smart-splits.nvim)
-	return pane:get_user_vars().IS_NVIM == "true" or process_name:find("n?vim") ~= nil
+	return process_name:find("n?vim") ~= nil
 end
 
 -- A pane is "interactive" if its foreground program has its own meaning for
 -- Ctrl+u / Ctrl+d and we must NOT steal those keys for scrolling. This includes
 -- plain shells (bash/zsh/fish) — splits launch a bare shell, where Ctrl+u =
--- kill-line and Ctrl+d = EOF must keep working — as well as nvim and tmux. The
+-- kill-line and Ctrl+d = EOF must keep working — as well as vim/nvim and tmux. The
 -- ScrollByPage fallback only fires for other fullscreen programs; Shift+PageUp/
 -- Down remains the always-available scroll.
 local function is_interactive(pane)
@@ -38,8 +41,7 @@ local function is_interactive(pane)
 	if process_name == nil then
 		return false
 	end
-	return pane:get_user_vars().IS_NVIM == "true"
-		or process_name:find("n?vim") ~= nil
+	return process_name:find("n?vim") ~= nil
 		or process_name:find("tmux") ~= nil
 		or process_name:find("bash") ~= nil
 		or process_name:find("zsh") ~= nil
@@ -72,17 +74,18 @@ local function split_nav(resize_or_move, key)
 		key = key,
 		mods = resize_or_move == "move" and "CTRL" or "LEADER|SHIFT",
 		action = wezterm.action_callback(function(win, pane)
-			if is_vim(pane) then
-				-- pass the keys through to vim/nvim
-				win:perform_action({
-					SendKey = { key = key, mods = resize_or_move == "move" and "CTRL" or "ALT" },
-				}, pane)
-			else
-				if resize_or_move == "move" then
-					win:perform_action({ ActivatePaneDirection = direction_keys[key] }, pane)
+			if resize_or_move == "move" then
+				if is_vim(pane) then
+					-- Inside vim: forward Ctrl+h/j/k/l so vim switches its own
+					-- windows. Map these to <C-w>h/j/k/l in your .vimrc.
+					win:perform_action({ SendKey = { key = key, mods = "CTRL" } }, pane)
 				else
-					win:perform_action({ AdjustPaneSize = { direction_keys[key], 5 } }, pane)
+					win:perform_action({ ActivatePaneDirection = direction_keys[key] }, pane)
 				end
+			else
+				-- Resize always acts on the WezTerm pane. Leader+Shift+h/j/k/l is
+				-- not a vim binding, so there is nothing to forward to the editor.
+				win:perform_action({ AdjustPaneSize = { direction_keys[key], 5 } }, pane)
 			end
 		end),
 	}
@@ -312,13 +315,13 @@ config.default_prog = { "bash", "-c", "exec tmux new-session || exec $SHELL" }
 local split_shell = { args = { os.getenv("SHELL") or "/bin/bash" } }
 
 -- =============================================================================
--- KEY BINDINGS - Neovim Compatible
+-- KEY BINDINGS - Vim/Neovim Compatible
 -- =============================================================================
 
 config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
 
 config.keys = {
-	-- Disable default Ctrl+Shift+Enter (for Neovim compatibility)
+	-- Disable default Ctrl+Shift+Enter (for Vim/Neovim compatibility)
 	{ key = "Enter", mods = "CTRL|SHIFT", action = act.DisableDefaultAssignment },
 
 	-- ==========================================================================
